@@ -1,0 +1,18 @@
+4
+# Grid: 4 lines of 4 values separated by commas.
+# 0 = empty cell; 1..4 = pre-filled digit.
+0, 0, 0, 0
+0, 0, 0, 0
+0, 0, 0, 0
+0, 0, 0, 0
+# Horizontal constraints: one line per row, 3 values.
+# 0 = no constraint, 1 = "<", -1 = ">"
+1, 0, 0
+0, 0, 1
+1, 0, 0
+1, 0, 1
+# Vertical constraints: one line per row (3 lines), 4 values.
+# 0 = no constraint, 1 = "^", -1 = "v"
+0, 0, 0, 1
+0, 0, 0, 0
+0, 1, 0, 0

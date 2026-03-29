@@ -1,0 +1,1 @@
+Chạy file main (khi ở folder Project2-GroupNotAI): python Outputs/main.py
