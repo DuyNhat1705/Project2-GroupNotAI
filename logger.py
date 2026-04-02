@@ -9,6 +9,7 @@ logger.history["steps"] = []
 class Logger:
     def __init__(self, algo_name):
         self.algo_name = algo_name
+        
         self.history = {} 
 
     def log(self, key, value):
