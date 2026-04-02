@@ -13,7 +13,7 @@ class Futoshiki():
         self.input_path = os.path.join(self.project_root, 'Inputs', f'{file}.txt')
         self.output_path = os.path.join(self.project_root, 'Outputs', f'output-{self.problemNumber}.txt')
         self.loadFromFile(self.input_path)
-
+        
     def loadFromFile(self,file):
         with open(file, 'r') as f:
             lines = f.readlines()
