@@ -8,8 +8,9 @@ class Futoshiki():
         self.grid = []
         self.HorizontalConstraints = []
         self.VerticalConstraints = []
-        self.data_path = os.path.join(self.project_root, 'Inputs', f'{file}.txt')
+        self.data_path = os.path.join(self.project_root, 'Project2\\Inputs', f'{file}.txt')
         self.loadFromFile(self.data_path)
+        
     def loadFromFile(self,file):
         with open(file, 'r') as f:
             lines = f.readlines()
@@ -58,3 +59,5 @@ class Futoshiki():
         print("Vertical Constraints:")
         for row in self.VerticalConstraints:
             print(row)
+            
+    
