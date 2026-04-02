@@ -2,14 +2,17 @@ import os
 
 class Futoshiki():
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.dirname(os.path.dirname(base_dir))
+    project_root = os.path.dirname(base_dir)
     def __init__(self, file):
         self.size = 0
         self.grid = []
+        self.solution = None
         self.HorizontalConstraints = []
         self.VerticalConstraints = []
-        self.data_path = os.path.join(self.project_root, 'Inputs', f'{file}.txt')
-        self.loadFromFile(self.data_path)
+        self.problemNumber = file[6:]
+        self.input_path = os.path.join(self.project_root, 'Inputs', f'{file}.txt')
+        self.output_path = os.path.join(self.project_root, 'Outputs', f'output-{self.problemNumber}.txt')
+        self.loadFromFile(self.input_path)
     def loadFromFile(self,file):
         with open(file, 'r') as f:
             lines = f.readlines()
@@ -46,15 +49,54 @@ class Futoshiki():
                 row = list(map(int, data[idx].split(',')))
                 self.VerticalConstraints.append(row)
                 idx += 1
-        
+    def setSolution(self, solution):
+        self.solution = solution
+    def writeFile(self):
+        if (self.solution == None):
+            print("The solution is not existent")
+            return
+        with open(self.output_path, 'w') as f:
+            for i in range(self.size):
+                for j in range(self.size):
+                    print(self.solution[i][j], end = ' ', file = f)
+                    if (j < self.size - 1):
+                        if (self.HorizontalConstraints[i][j] == 1):
+                            print("<", end = ' ', file = f)
+                        elif (self.HorizontalConstraints[i][j] == -1):
+                            print(">", end = ' ', file = f)
+                        else:
+                            print(" ", end = ' ', file = f)
+                print(file = f)
+                if(i < self.size - 1):
+                    for j in range(self.size):
+                        if(self.VerticalConstraints[i][j] == 1):
+                            print("∧", end = "   ", file = f)
+                        elif (self.VerticalConstraints[i][j] == -1):
+                            print("V", end = "   ", file = f)
+                        else:
+                            print(" ", end = "   ", file = f)
+                    print(file = f)
+        print(f"The solution of input-{self.problemNumber} has been written to {self.output_path}")
     def printFutoshiki(self):
         print(f"Size: {self.size}")
         print("Grid:")
-        for row in self.grid:
-            print(row)
-        print("Horizontal Constraints:")
-        for row in self.HorizontalConstraints:
-            print(row)
-        print("Vertical Constraints:")
-        for row in self.VerticalConstraints:
-            print(row)
+        for i in range(self.size):
+            for j in range(self.size):
+                print(self.grid[i][j], end = ' ')
+                if (j < self.size - 1):
+                    if (self.HorizontalConstraints[i][j] == 1):
+                        print("<", end = ' ')
+                    elif (self.HorizontalConstraints[i][j] == -1):
+                        print(">", end = ' ')
+                    else:
+                        print(" ", end = ' ')
+            print()
+            if(i < self.size - 1):
+                for j in range(self.size):
+                    if(self.VerticalConstraints[i][j] == 1):
+                        print("∧", end = "   ")
+                    elif (self.VerticalConstraints[i][j] == -1):
+                        print("V", end = "   ")
+                    else:
+                        print(" ", end = "   ")
+                print()
