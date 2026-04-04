@@ -55,7 +55,7 @@ class Futoshiki():
         if (self.solution == None):
             print("The solution is not existent")
             return
-        with open(self.output_path, 'w') as f:
+        with open(self.output_path, 'w', encoding = "utf-8") as f:
             for i in range(self.size):
                 for j in range(self.size):
                     print(self.solution[i][j], end = ' ', file = f)
@@ -83,6 +83,29 @@ class Futoshiki():
         for i in range(self.size):
             for j in range(self.size):
                 print(self.grid[i][j], end = ' ')
+                if (j < self.size - 1):
+                    if (self.HorizontalConstraints[i][j] == 1):
+                        print("<", end = ' ')
+                    elif (self.HorizontalConstraints[i][j] == -1):
+                        print(">", end = ' ')
+                    else:
+                        print(" ", end = ' ')
+            print()
+            if(i < self.size - 1):
+                for j in range(self.size):
+                    if(self.VerticalConstraints[i][j] == 1):
+                        print("∧", end = "   ")
+                    elif (self.VerticalConstraints[i][j] == -1):
+                        print("V", end = "   ")
+                    else:
+                        print(" ", end = "   ")
+                print()
+    def printFutoshikiResult(self):
+        if self.solution == None:
+            print("The solution is not existent")
+        for i in range(self.size):
+            for j in range(self.size):
+                print(self.solution[i][j], end = ' ')
                 if (j < self.size - 1):
                     if (self.HorizontalConstraints[i][j] == 1):
                         print("<", end = ' ')

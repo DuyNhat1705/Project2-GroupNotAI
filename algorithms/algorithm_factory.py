@@ -1,5 +1,6 @@
 from algorithms.aStar import AStar
 from algorithms.backTracking import Backtracking
+from algorithms.bruteForce import BruteForce
 from algorithms.forwardChaining import ForwardChaining
 from algorithms.backwardChaining import BackwardChaining
 
@@ -15,7 +16,10 @@ def get_algorithm(name):
         "bc": BackwardChaining,
 
         "backtracking": Backtracking,
-        "bt": Backtracking
+        "bt": Backtracking,
+
+        "bruteforce": BruteForce,
+        "bf": BruteForce
     }
     if name not in algoDict:
         raise ValueError(f"Algorithm '{name}' not found. Available: {list(algoDict.keys())}")
