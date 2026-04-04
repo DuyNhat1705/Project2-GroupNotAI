@@ -1,5 +1,7 @@
 from algorithms.base_algorithm import BaseAlgorithm
 import heapq
+import time
+import sys
 from logger import Logger
 
 class AStar(BaseAlgorithm):
@@ -243,7 +245,8 @@ class AStar(BaseAlgorithm):
 
     def solve(self, problem):
         # Implement the Astar algorithm here
-        print("Implementing A* algorithm...")
+        print("Running A* algorithm...")
+        start_time = time.time()
 
         # Declared nessesscary variable
         my_logger = Logger(self.name)
@@ -273,7 +276,18 @@ class AStar(BaseAlgorithm):
             # Check if is it the goal state
             if curr_rem == 0:
                 if problem.isGoalState(curr_grid):
-                    print("Goal found!")
+                    end_time = time.time()
+                    my_logger.log("execution_time", f"{end_time - start_time:.4f}s")
+                    my_logger.log("nodes_expanded", counter)
+                    my_logger.log("memory_usage", f"{sys.getsizeof(pq) / 1024:.2f} KB")
+
+                    '''
+                    print("execution_time", f"{end_time - start_time:.4f}s")
+                    print("nodes_expanded", counter)
+                    print("memory_usage", f"{sys.getsizeof(pq) / 1024:.2f} KB")
+                    '''
+                    
+                    print(f"Goal found!")
                     return curr_grid
 
             # Finding the next cell using MRV
