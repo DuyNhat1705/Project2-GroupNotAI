@@ -1,10 +1,10 @@
 from algorithms.base_algorithm import BaseAlgorithm
 import heapq
-import copy
 from logger import Logger
 
 class AStar(BaseAlgorithm):
     def __init__(self, params = None):
+        self.remaining = 0
         super().__init__("A*", params)  
         
     def constraint(self, problem):
@@ -16,6 +16,7 @@ class AStar(BaseAlgorithm):
         c_grid = [[set() for _ in range(cols)] for _ in range(rows)]
         highest_constraint = -1
         i, j = -1, -1
+        self.remaining = 0 # Reset remaining count
 
         for row in range(rows):
             for col in range(cols):
@@ -97,7 +98,9 @@ class AStar(BaseAlgorithm):
         # Find the varible with the most constraint cell for starting point
         for r in range(rows):
             for c in range(cols):
+                set_size = 0
                 if problem.grid[r][c] == 0: 
+                    self.remaining += 1
                     set_size = len(c_grid[r][c])
 
                 # Update when more constraint found
@@ -108,19 +111,44 @@ class AStar(BaseAlgorithm):
         # Return the constaints grid and the most constraint cell position
         return i, j, c_grid
 
-    def heuristic(self, problem, problem_grid, constraint_grid, row, col, value):
-        '''
-        Arc-consistency (AC-3) as an informed lower bound: count cells whose domain, after constraint propagation, is empty.
-        '''
+    def heuristic(self, problem, problem_grid, constraint_grid, row, col, value, current_remaining, option = 3):
         rows = len(problem_grid)       
         cols = len(problem_grid[0])    
         n = rows
 
-        temp_grid = copy.deepcopy(problem_grid)
-        temp_c_grid = copy.deepcopy(constraint_grid)
+        # Optimization: use list comprehension instead of deepcopy for speed
+        temp_grid = [r[:] for r in problem_grid]
+        temp_c_grid = [[set(s) for s in r] for r in constraint_grid]
         h_value = 0
 
+        # =========================================
+        # ======        Heuristic 2          ======
+        # =========================================
+        additional_steps = 0
+
         temp_grid[row][col] = value
+        remaining_cells = current_remaining - 1
+
+        for r in range(rows):
+            for c in range(cols):
+                # Horizontal constraints
+                if c < cols - 1:
+                    rel_h = problem.HorizontalConstraints[r][c]
+                    if rel_h != 0: 
+                        if temp_grid[r][c] == 0 or temp_grid[r][c+1] == 0:
+                            additional_steps += 1
+                
+                # Vertical constraints
+                if r < rows - 1:
+                    rel_v = problem.VerticalConstraints[r][c]
+                    if rel_v != 0: 
+                        if temp_grid[r][c] == 0 or temp_grid[r+1][c] == 0:
+                            additional_steps += 1
+
+        # =========================================
+        # ======      Heuristic 1 & 3        ======
+        # =========================================
+        ac3 = 0
 
         # Increase constraint value of the whole row
         for r in range(rows):
@@ -128,7 +156,7 @@ class AStar(BaseAlgorithm):
 
             # If after constraint propagation, is empty
             if temp_grid[r][col] == 0 and len(temp_c_grid[r][col]) == n:
-                h_value += 1
+                ac3 += 1
 
         # Increase constraint value of the whole col    
         for c in range(cols):
@@ -136,11 +164,11 @@ class AStar(BaseAlgorithm):
 
             # If after constraint propagation, is empty
             if temp_grid[row][c] == 0 and len(temp_c_grid[row][c]) == n:
-                h_value += 1
+                ac3 += 1
 
         # Constraints for left cell
-        relation = problem.HorizontalConstraints[row][col - 1]
         if col > 0:
+            relation = problem.HorizontalConstraints[row][col - 1]
             if relation == 1:
                 for v in range(value, n + 1):
                     temp_c_grid[row][col - 1].add(v)
@@ -150,7 +178,7 @@ class AStar(BaseAlgorithm):
 
             # If after constraint propagation, is empty
             if temp_grid[row][col - 1] == 0 and len(temp_c_grid[row][col - 1]) == n: 
-                h_value += 1
+                ac3 += 1
 
         # Constraints for right cell
         if col < cols - 1:
@@ -164,9 +192,9 @@ class AStar(BaseAlgorithm):
 
             # If after constraint propagation, is empty
             if temp_grid[row][col + 1] == 0 and len(temp_c_grid[row][col + 1]) == n: 
-                h_value += 1
+                ac3 += 1
 
-        # Constraints for down cell
+        # Constraints for up cell
         if row > 0:
             relation = problem.VerticalConstraints[row - 1][col]
             if relation == 1:
@@ -178,9 +206,9 @@ class AStar(BaseAlgorithm):
 
             # If after constraint propagation, is empty
             if temp_grid[row - 1][col] == 0 and len(temp_c_grid[row - 1][col]) == n: 
-                h_value += 1
+                ac3 += 1
 
-        # Constraints for up cell
+        # Constraints for down cell
         if row < rows - 1:
             relation = problem.VerticalConstraints[row][col]
             if relation == 1:
@@ -192,9 +220,16 @@ class AStar(BaseAlgorithm):
 
             # If after constraint propagation, is empty
             if temp_grid[row + 1][col] == 0 and len(temp_c_grid[row + 1][col]) == n: 
-                h_value += 1
+                ac3 += 1
 
-        return row, col, value, h_value, temp_grid, temp_c_grid        
+        if option == 1:
+            h_value = remaining_cells
+        elif option == 2:
+            h_value = additional_steps
+        elif option == 3:
+            h_value = ac3
+
+        return row, col, value, h_value, temp_grid, temp_c_grid, remaining_cells        
 
     def getValidMoves(self, row, col, c_grid):
         n = len(c_grid)
@@ -219,24 +254,27 @@ class AStar(BaseAlgorithm):
         valid_moves = self.getValidMoves(row, col, c_grid)
 
         for v in valid_moves:
-            _, _, _, h_value, temp_grid, temp_c_grid = self.heuristic(problem, problem.grid, c_grid, row, col, v)
+            _, _, _, h_value, temp_grid, temp_c_grid, rem = self.heuristic(problem, problem.grid, c_grid, row, col, v, self.remaining, 3)
             
             g_value = 1 
             f_value = g_value + h_value 
             
             last_move = ((row, col), v)
             
-            heapq.heappush(pq, (f_value, counter, g_value, temp_grid, temp_c_grid, last_move))
+            heapq.heappush(pq, (f_value, counter, g_value, temp_grid, temp_c_grid, last_move, rem))
             counter += 1
 
         while pq:
-            f_value, _, g_value, curr_grid, curr_c_grid, last_move = heapq.heappop(pq)
+            f_value, _, g_value, curr_grid, curr_c_grid, last_move, curr_rem = heapq.heappop(pq)
 
             my_logger.log("steps", last_move)
 
-            if problem.isGoalState(curr_grid):
-                print("Goal found!")
-                return curr_grid
+            # If there is no more cells
+            # Check if is it the goal state
+            if curr_rem == 0:
+                if problem.isGoalState(curr_grid):
+                    print("Goal found!")
+                    return curr_grid
 
             # Finding the next cell using MRV
             next_row, next_col = -1, -1
@@ -256,17 +294,17 @@ class AStar(BaseAlgorithm):
 
             valid_moves_for_next_cell = self.getValidMoves(next_row, next_col, curr_c_grid)
 
+            # Getting all the valid moves from the cell
             for v in valid_moves_for_next_cell:
-                _, _, _, h_value, next_grid, next_c_grid = self.heuristic(problem, curr_grid, curr_c_grid, next_row, next_col, v)
+                _, _, _, h_value, next_grid, next_c_grid, next_rem = self.heuristic(problem, curr_grid, curr_c_grid, next_row, next_col, v, curr_rem, 3)
                 
                 new_g = g_value + 1
                 new_f = new_g + h_value
                 
                 new_move = ((next_row, next_col), v)
                 
-                heapq.heappush(pq, (new_f, counter, new_g, next_grid, next_c_grid, new_move))
+                heapq.heappush(pq, (new_f, counter, new_g, next_grid, next_c_grid, new_move, next_rem))
                 counter += 1
 
-        print("Goal not found!")
+        print("Can't solve!")
         return []
-
