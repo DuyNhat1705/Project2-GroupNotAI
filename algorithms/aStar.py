@@ -2,7 +2,7 @@ from algorithms.base_algorithm import BaseAlgorithm
 import heapq
 import time
 import sys
-from logger import Logger
+from utils.logger import step_logger
 
 class AStar(BaseAlgorithm):
     def __init__(self, params = None):
@@ -246,10 +246,9 @@ class AStar(BaseAlgorithm):
     def solve(self, problem):
         # Implement the Astar algorithm here
         print("Running A* algorithm...")
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         # Declared nessesscary variable
-        my_logger = Logger(self.name)
         pq = []
         counter = 0 
 
@@ -270,17 +269,14 @@ class AStar(BaseAlgorithm):
         while pq:
             f_value, _, g_value, curr_grid, curr_c_grid, last_move, curr_rem = heapq.heappop(pq)
 
-            my_logger.log("steps", last_move)
-
+            step_logger.log_step(last_move[0][0], last_move[0][1], last_move[1], tag= "deduced", domains = step_logger.grid_to_domains(curr_grid))
             # If there is no more cells
             # Check if is it the goal state
             if curr_rem == 0:
                 if problem.isGoalState(curr_grid):
-                    end_time = time.time()
-                    my_logger.log("execution_time", f"{end_time - start_time:.4f}s")
-                    my_logger.log("nodes_expanded", counter)
-                    my_logger.log("memory_usage", f"{sys.getsizeof(pq) / 1024:.2f} KB")
-
+                    end_time = time.perf_counter()
+                    step_logger.execution_time = (end_time - start_time) * 1000
+                    step_logger.memory_usage = sys.getsizeof(pq) / 1024
                     '''
                     print("execution_time", f"{end_time - start_time:.4f}s")
                     print("nodes_expanded", counter)

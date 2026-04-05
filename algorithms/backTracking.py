@@ -1,5 +1,7 @@
-from algorithms.base_algorithm import BaseAlgorithm
 
+import time
+from algorithms.base_algorithm import BaseAlgorithm
+from utils.logger import step_logger
 class Backtracking(BaseAlgorithm):
 
     def __init__(self, params = None):
@@ -38,11 +40,13 @@ class Backtracking(BaseAlgorithm):
             for num in range(1, n + 1):
                 if self.isValid(num, solution, problem, i, j, n):
                     solution[i][j] = num
+                    step_logger.log_step(i, j, num, tag = "deduced", domains = step_logger.grid_to_domains(solution))
                     if (i == n - 1) and (j == n - 1):
                         return True
-                    if self.recursion(solution, problem, indexRow, indexCol,n):
+                    if self.recursion(solution, problem, indexRow, indexCol, n):
                         return True
                     solution[i][j] = 0
+                    step_logger.log_step(i, j, 0, tag = 'backtrack', domains = step_logger.grid_to_domains(solution))
             return False
         else:
             if (i == n - 1) and (j == n - 1):
@@ -52,5 +56,8 @@ class Backtracking(BaseAlgorithm):
         # Implement the backtracking algorithm here
         n = problem.size
         solution = problem.grid
+        start_time = time.perf_counter()
         self.recursion(solution, problem, 0, 0, n)
+        end_time = time.perf_counter()
+        step_logger.execution_time = (end_time - start_time) * 1000
         return solution
