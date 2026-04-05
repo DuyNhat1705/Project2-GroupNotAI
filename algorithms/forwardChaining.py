@@ -1,5 +1,7 @@
+import time
 from algorithms.base_algorithm import BaseAlgorithm
 from algorithms.groundKB import KnowledgeBase
+from utils.logger import step_logger
 
 
 class ForwardChaining(BaseAlgorithm):
@@ -12,18 +14,27 @@ class ForwardChaining(BaseAlgorithm):
     # ------------------------------------------------------------------
 
     def solve(self, puzzle):
+        step_logger.reset(puzzle)
+        start_time = time.perf_counter()
+
         kb = KnowledgeBase(puzzle)
 
-        # Apply A5: Given → Val  (obs_facts already has Given atoms from _init_facts)
+        # Apply A5: Given → Val
         for fact in list(kb.obs_facts):
-            if isinstance(fact, object) and hasattr(fact, 'name') and fact.name == 'Given':
+            if hasattr(fact, 'name') and fact.name == 'Given':
                 i = fact.args[0].value
                 j = fact.args[1].value
                 v = fact.args[2].value
                 kb.add_val(i, j, v)
+                step_logger.log_step(i, j, v, tag='given',
+                                     domains=dict(kb.domains),
+                                     facts_count=len(kb.obs_facts))
 
         # Run FC + backtracking
         result_kb = self._backtrack(kb)
+
+        step_logger.execution_time = (time.perf_counter() - start_time) * 1000
+
         if result_kb is None:
             return None  # no solution found
 
@@ -38,33 +49,27 @@ class ForwardChaining(BaseAlgorithm):
         while changed:
             changed = False
 
-            # --- Apply known Val facts ---
-            for fact in list(kb.obs_facts):
-                if not (hasattr(fact, 'name') and fact.name == 'Val'):
-                    continue
+            # --- Apply known Val facts (filter once per iteration) ---
+            val_facts = [f for f in kb.obs_facts if hasattr(f, 'name') and f.name == 'Val']
+            for fact in val_facts:
                 i = fact.args[0].value
                 j = fact.args[1].value
                 v = fact.args[2].value
 
-                # A2: narrow domain (i,j) to {v}
-                if kb.domains[(i, j)] != {v}:
-                    kb.domains[(i, j)] = {v}
-                    changed = True
-
-                # A3: Row uniqueness — exclude v from domain cells in same row
+                # A3: Row uniqueness — exclude v from same row
                 for j2 in range(1, kb.size + 1):
                     if j2 != j and v in kb.domains[(i, j2)]:
                         kb.domains[(i, j2)].discard(v)
                         changed = True
 
-                # A6: Column uniqueness — exclude v from domain cells in same column
+                # A6: Column uniqueness — exclude v from same column
                 for i2 in range(1, kb.size + 1):
                     if i2 != i and v in kb.domains[(i2, j)]:
                         kb.domains[(i2, j)].discard(v)
                         changed = True
 
             # --- Apply inequality constraints ---
-            for fact in list(kb.obs_facts):
+            for fact in kb.obs_facts:
                 if not hasattr(fact, 'name'):
                     continue
 
@@ -92,7 +97,7 @@ class ForwardChaining(BaseAlgorithm):
                     j = fact.args[1].value
                     changed |= self._apply_less(kb, (i + 1, j), (i, j))
 
-            # --- A1: domain has 1 value → add Val fact ---
+            # --- A1: domain size == 1 → add Val fact ---
             for i in range(1, kb.size + 1):
                 for j in range(1, kb.size + 1):
                     d = kb.domains[(i, j)]
@@ -101,6 +106,9 @@ class ForwardChaining(BaseAlgorithm):
                         if not kb.has_val(i, j, v):
                             kb.add_val(i, j, v)
                             changed = True
+                            step_logger.log_step(i, j, v, tag='deduced',
+                                                 domains=dict(kb.domains),
+                                                 facts_count=len(kb.obs_facts))
 
             # Early contradiction check
             if kb.is_contradiction():
@@ -125,7 +133,7 @@ class ForwardChaining(BaseAlgorithm):
         return changed
 
     # ------------------------------------------------------------------
-    # Backtracking (used when FC alone is not sufficient to solve completely)
+    # Backtracking (used when FC alone is not sufficient)
     # ------------------------------------------------------------------
 
     def _backtrack(self, kb):
@@ -148,10 +156,18 @@ class ForwardChaining(BaseAlgorithm):
         for v in sorted(kb.domains[(i, j)]):
             kb_copy = kb.clone()
             kb_copy.add_val(i, j, v)
+            step_logger.log_step(i, j, v, tag='deduced',
+                                 domains=dict(kb_copy.domains),
+                                 facts_count=len(kb_copy.obs_facts))
 
             result = self._backtrack(kb_copy)
             if result is not None:
                 return result
+
+            # backtrack — log the rollback
+            step_logger.log_step(i, j, 0, tag='backtrack',
+                                 domains=dict(kb.domains),
+                                 facts_count=len(kb.obs_facts))
 
         return None  # no valid value found
 
@@ -161,7 +177,7 @@ class ForwardChaining(BaseAlgorithm):
         for i in range(1, kb.size + 1):
             for j in range(1, kb.size + 1):
                 d = kb.domains[(i, j)]
-                if len(d) > 1 and len(d) < best_size:
+                if 1 < len(d) < best_size:
                     best = (i, j)
                     best_size = len(d)
         return best
