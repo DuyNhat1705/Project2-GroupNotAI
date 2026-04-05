@@ -37,6 +37,12 @@ class Const(Term):
     def __str__(self):
         return str(self.value)
 
+    def __eq__(self, other):
+        return isinstance(other, Const) and self.value == other.value
+
+    def __hash__(self):
+        return hash(self.value)
+
 class Atom(Formula):
     def __init__(self, name, *args):
         self.name = name
@@ -87,7 +93,7 @@ class Imply(Expression):
 
 class Exist(Formula):
     def __init__(self, var, clause):
-        self.var = var(var) if isinstance(var, str) else str(var)
+        self.var = Var(var) if isinstance(var, str) else str(var)
         self.body = clause
     def __str__(self):
         return 'EXISTS(' + str(self.var) + ',' + str(self.body) + ')'
@@ -102,7 +108,7 @@ class Forall(Formula):
 def Substitute(theta, expr):
     if isinstance(expr, Var):
         if expr.name in theta:
-            #recursively call substitute in case it points to another var
+            # recursively call substitute in case it points to another var
             return Substitute(theta, theta[expr.name])
         return expr
     elif isinstance(expr, Const):
@@ -111,6 +117,12 @@ def Substitute(theta, expr):
         return Atom(expr.name, *[Substitute(theta, arg) for arg in expr.args])
     elif isinstance(expr, And):
         return And(*[Substitute(theta, arg) for arg in expr.args])
+    elif isinstance(expr, Or):
+        return Or(*[Substitute(theta, arg) for arg in expr.args])
+    elif isinstance(expr, Imply):
+        return Imply(Substitute(theta, expr.left), Substitute(theta, expr.right))
+    elif isinstance(expr, Not):
+        return Not(Substitute(theta, expr.arg))
     return expr
 
 def Unify(x, y, theta):
@@ -212,7 +224,7 @@ class KnowledgeBase:
 
         # A2 (Every cell has at most one value):
         A2 = Forall('$i', 
-                Forall('j', 
+                Forall('$j',
                         (Forall('$v1', 
                                 Forall('$v2',
                                        Imply(And(Val('$i', '$j', '$v1'), Val('$i', '$j', '$v2')),
@@ -252,7 +264,7 @@ class KnowledgeBase:
                            Forall('$i2',
                                   Forall('$v',
                                          Imply(And(Val('$i1', '$j', '$v'), Val('$i2', '$j', '$v'), Not(Eq('$i1', '$i2'))),
-                                               Bot)))))
+                                               Bot())))))
         
         
         
@@ -443,10 +455,10 @@ class KnowledgeBase:
     def init_horn_rules(self):
         """
         Defines abstract Horn clauses for Backward Chaining
-        Format: Implies(Premise, Conclusion)
+        Format: Imply(Premise, Conclusion)
         """
 
-        # Force the given value
+        # Force the given value (Base truth)
         self.horn_rules.append(Imply(
             Given('$i', '$j', '$v'),
             Val('$i', '$j', '$v')
@@ -457,7 +469,7 @@ class KnowledgeBase:
             And(
                 LessH('$i', '$j'),
                 Atom('NextCol', '$j', '$j_next'),
-                Val('$i', '$j_next', '$v2'),
+                Given('$i', '$j_next', '$v2'),  # <-- CHANGED: Look at the actual board, don't guess!
                 Atom('Less', '$v1', '$v2')
             ),
             Val('$i', '$j', '$v1')
@@ -470,7 +482,7 @@ class KnowledgeBase:
             And(
                 Atom('NextCol', '$j_prev', '$j'),  # Find the column to the left
                 LessH('$i', '$j_prev'),  # Check if it has a '<'
-                Val('$i', '$j_prev', '$v1'),  # Get its value
+                Given('$i', '$j_prev', '$v1'),  # <-- CHANGED
                 Atom('Less', '$v1', '$v2')  # Ensure less-than
             ),
             Val('$i', '$j', '$v2')
@@ -482,8 +494,8 @@ class KnowledgeBase:
             And(
                 GreaterH('$i', '$j'),
                 Atom('NextCol', '$j', '$j_next'),
-                Val('$i', '$j_next', '$v2'),
-                Atom('Less', '$v2', '$v1') # order flipped
+                Given('$i', '$j_next', '$v2'),  # <-- CHANGED
+                Atom('Less', '$v2', '$v1')  # order flipped
             ),
             Val('$i', '$j', '$v1')
         ))
@@ -494,7 +506,7 @@ class KnowledgeBase:
             And(
                 Atom('NextCol', '$j_prev', '$j'),  # find the left col
                 GreaterH('$i', '$j_prev'),  # Check if it has a '>'
-                Val('$i', '$j_prev', '$v1'),  # Get its value
+                Given('$i', '$j_prev', '$v1'),  # <-- CHANGED
                 Atom('Less', '$v2', '$v1')  # Ensure constraint
             ),
             Val('$i', '$j', '$v2')
@@ -506,7 +518,7 @@ class KnowledgeBase:
             And(
                 LessV('$i', '$j'),
                 Atom('NextRow', '$i', '$i_next'),
-                Val('$i_next', '$j', '$v2'),
+                Given('$i_next', '$j', '$v2'),  # <-- CHANGED
                 Atom('Less', '$v1', '$v2')
             ),
             Val('$i', '$j', '$v1')
@@ -518,7 +530,7 @@ class KnowledgeBase:
             And(
                 Atom('NextRow', '$i_prev', '$i'),  # Find the row above us
                 LessV('$i_prev', '$j'),  # Check if it has a '^'
-                Val('$i_prev', '$j', '$v1'),  # Get its value
+                Given('$i_prev', '$j', '$v1'),  # <-- CHANGED
                 Atom('Less', '$v1', '$v2')
             ),
             Val('$i', '$j', '$v2')
@@ -530,7 +542,7 @@ class KnowledgeBase:
             And(
                 GreaterV('$i', '$j'),
                 Atom('NextRow', '$i', '$i_next'),
-                Val('$i_next', '$j', '$v2'),
+                Given('$i_next', '$j', '$v2'),  # <-- CHANGED
                 Atom('Less', '$v2', '$v1')
             ),
             Val('$i', '$j', '$v1')
@@ -542,7 +554,7 @@ class KnowledgeBase:
             And(
                 Atom('NextRow', '$i_prev', '$i'),
                 GreaterV('$i_prev', '$j'),
-                Val('$i_prev', '$j', '$v1'),
+                Given('$i_prev', '$j', '$v1'),  # <-- CHANGED
                 Atom('Less', '$v2', '$v1')
             ),
             Val('$i', '$j', '$v2')
