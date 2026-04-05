@@ -117,7 +117,7 @@ def render_step_log_html(steps, current_idx):
       })();
     </script>'''
 
-    full_html = f'''
+    full_html = f'''s
     <!DOCTYPE html>
     <html>
     <head><style>
@@ -133,7 +133,7 @@ def render_step_log_html(steps, current_idx):
     </style></head>
     <body>
       <!-- visibility:hidden để ẩn trong khi JS chưa scroll đúng vị trí -->
-      <div id="log-wrapper" style="max-height:310px;overflow-y:auto;padding-right:4px;visibility:hidden;">
+      <div id="log-wrapper" style="max-height:215px;overflow-y:auto;padding-right:4px;visibility:hidden;">
         {items_html}
       </div>
       {scroll_js}
