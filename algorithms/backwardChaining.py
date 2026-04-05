@@ -1,18 +1,15 @@
 from algorithms.base_algorithm import BaseAlgorithm
 from algorithms.logic import Var, Const, Atom, And, Imply, Unify, Substitute, KnowledgeBase
-from logger import Logger
 
 class BackwardChaining(BaseAlgorithm):
 
     def __init__(self, params = None):
         self.kb = None
         self.cnt = 0 # later assigned idx
-        self.logger = Logger("Backward Chaining")  # Initialize logger
         super().__init__("Backward Chaining", params)
 
     def solve(self, problem):
         self.kb = KnowledgeBase(problem)
-        self.logger.log("system", "Knowledge Base initialized.")
         print(f"Backward chaining for {problem.size}x{problem.size}...\n")
 
         # initial scratchpad
@@ -22,10 +19,10 @@ class BackwardChaining(BaseAlgorithm):
         if self.backtrack_solve(problem, domains):
             print("\nPuzzle Solved!")
             problem.printFutoshiki()
-            return True
+            return problem.grid
         else:
             print("\nFAILED: The engine could not find a valid solution.")
-            return False
+            return problem.grid
 
     def backtrack_solve(self, problem, domains):
         # get the MRV cell
