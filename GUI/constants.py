@@ -6,4 +6,9 @@ ALGO_MAP = {
     "A* Search": "astar",
 }
 
-STEP_DELAY_OPTIONS = {"Chậm (1s)": 1.0, "Vừa (0.5s)": 0.5, "Nhanh (0.2s)": 0.2, "Rất nhanh (0.05s)": 0.05}
+STEP_DELAY_OPTIONS = {
+    "Slow (1.0s)": 1.0, 
+    "Normal (0.5s)": 0.5, 
+    "Fast (0.2s)": 0.2, 
+    "Very Fast (0.05s)": 0.05
+}

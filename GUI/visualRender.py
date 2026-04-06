@@ -65,38 +65,38 @@ def render_step_log_html(steps, current_idx):
     """
     # Màu sắc cho từng loại bước
     tag_styles = {
-        'given':    ('Given',    '#a78bfa', 'rgba(99,102,241,0.3)'),
-        'deduced':  ('Deduced',  '#34d399', 'rgba(52,211,153,0.2)'),
-        'backtrack':('Backtrack','#fbbf24', 'rgba(251,191,36,0.2)'),
+        'given':    ('GIVEN',    '#00f5ff', 'rgba(0, 245, 255, 0.15)'),
+        'deduced':  ('DEDUCED',  '#00ff88', 'rgba(0, 255, 136, 0.15)'),
+        'backtrack':('BACKTRACK','#ffdd00', 'rgba(255, 221, 0, 0.15)'),
     }
 
     items_html = ''
     for idx, s in enumerate(steps):
         is_cur = (idx == current_idx)
         cur_id = 'id="step-active"' if is_cur else ''
-        item_bg    = 'rgba(139,92,246,0.15)' if is_cur else 'rgba(255,255,255,0.03)'
-        item_border= 'rgba(139,92,246,0.5)'  if is_cur else 'rgba(255,255,255,0.06)'
-        num_bg     = '#7c3aed'               if is_cur else 'rgba(99,102,241,0.3)'
-        num_color  = 'white'                 if is_cur else '#a78bfa'
+        item_bg    = 'rgba(0,245,255,0.1)' if is_cur else 'rgba(30,20,60,0.6)'
+        item_border= 'rgba(0,245,255,0.5)'  if is_cur else 'rgba(157,78,221,0.3)'
+        num_bg     = '#00f5ff'               if is_cur else 'rgba(157,78,221,0.3)'
+        num_color  = '#0a0e27'               if is_cur else '#c77dff'
 
-        label, color, bg = tag_styles.get(s['tag'], (s['tag'], '#94a3b8', 'rgba(255,255,255,0.1)'))
-        tag_span = (f'<span style="display:inline-block;padding:1px 7px;border-radius:4px;'
-                    f'font-size:0.68rem;font-weight:600;margin-right:5px;'
-                    f'background:{bg};color:{color};">{label}</span>')
+        label, color, bg = tag_styles.get(s['tag'], (s['tag'], '#0099ff', 'rgba(0, 153, 255, 0.15)'))
+        tag_span = (f'<span style="display:inline-block;padding:2px 6px;border-radius:0px;'
+                    f'font-size:0.68rem;font-weight:700;margin-right:5px;'
+                    f'background:{bg};color:{color};border:1px solid {color};">{label}</span>')
 
         items_html += f'''
         <div {cur_id} style="display:flex;align-items:flex-start;gap:10px;
-            padding:8px 10px;border-radius:10px;margin-bottom:6px;
+            padding:8px 10px;border-radius:0px;margin-bottom:6px;
             background:{item_bg};border:1px solid {item_border};">
-          <div style="min-width:26px;height:26px;border-radius:50%;
+          <div style="min-width:26px;height:26px;border-radius:0px;
               background:{num_bg};color:{num_color};
               display:flex;align-items:center;justify-content:center;
-              font-size:0.7rem;font-weight:700;font-family:monospace;flex-shrink:0;">{s["step_num"]}</div>
+              font-size:0.7rem;font-weight:700;font-family:monospace;flex-shrink:0;border:1px solid {num_bg};">{s["step_num"]}</div>
           <div style="flex:1;">
-            <div style="font-size:0.84rem;color:#e2e8f0;font-weight:500;margin-bottom:2px;">
-              {tag_span} Val{s["action"]}
+            <div style="font-size:0.84rem;color:#00f5ff;font-weight:700;margin-bottom:2px;text-shadow:0 0 5px #00f5ff;">
+              {tag_span} VALUE: {s["action"]}
             </div>
-            <div style="font-size:0.73rem;color:#64748b;font-family:monospace;">
+            <div style="font-size:0.73rem;color:#c77dff;font-family:monospace;text-shadow:0 0 3px #9d4edd;">
               facts: {s["facts_count"]} &nbsp;|&nbsp; cell ({s["cell"][0]},{s["cell"][1]})
             </div>
           </div>
@@ -117,19 +117,19 @@ def render_step_log_html(steps, current_idx):
       })();
     </script>'''
 
-    full_html = f'''s
+    full_html = f'''
     <!DOCTYPE html>
     <html>
     <head><style>
       body {{
         margin: 0; padding: 0;
         background: transparent;
-        font-family: 'Inter', sans-serif;
+        font-family: 'JetBrains Mono', monospace;
         overflow-x: hidden;
       }}
       ::-webkit-scrollbar {{ width: 5px; }}
       ::-webkit-scrollbar-track {{ background: transparent; }}
-      ::-webkit-scrollbar-thumb {{ background: rgba(139,92,246,0.4); border-radius: 99px; }}
+      ::-webkit-scrollbar-thumb {{ background: rgba(0, 245, 255, 0.4); border-radius: 99px; }}
     </style></head>
     <body>
       <!-- visibility:hidden để ẩn trong khi JS chưa scroll đúng vị trí -->
@@ -160,13 +160,13 @@ def render_kb_domains_html(puzzle, step, highlight_cell=None):
 
     html = '<table class="kb-table" cellspacing="3">'
     # Header row (col indices)
-    html += '<tr><td style="width:22px;color:#475569;font-size:0.7rem;"></td>'
+    html += '<tr><td style="width:22px;color:#c77dff;font-size:0.7rem;text-shadow:0 0 3px #9d4edd;"></td>'
     for j in range(1, n+1):
-        html += f'<td style="text-align:center;color:#475569;font-size:0.7rem;font-weight:600;">c{j}</td>'
+        html += f'<td style="text-align:center;color:#c77dff;font-size:0.7rem;font-weight:600;text-shadow:0 0 3px #9d4edd;">c{j}</td>'
     html += '</tr>'
 
     for i in range(1, n+1):
-        html += f'<tr><td style="color:#475569;font-size:0.7rem;font-weight:600;padding:2px 4px;">r{i}</td>'
+        html += f'<tr><td style="color:#c77dff;font-size:0.7rem;font-weight:600;padding:2px 4px;text-shadow:0 0 3px #9d4edd;">r{i}</td>'
         for j in range(1, n+1):
             dom = domains.get((i, j), frozenset())
             size = len(dom)
