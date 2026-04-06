@@ -238,7 +238,6 @@ class KnowledgeBase:
                                          Imply(And(Val('$i', '$j1', '$v'), Val('$i', '$j2', '$v'), Not(Eq('$j1', '$j2'))),
                                                Bot())))))
         
-        
         # A4 (Horizontal less-than constraints):
         A4 = Forall('$i', 
                         Forall('$j', 
@@ -254,7 +253,6 @@ class KnowledgeBase:
                                                         Atom('Less', '$v1', '$v2')             
                                                     ))))))
         
-        
         # A5 (Given clues are enforced):
         A5 = Forall('$i', Forall('$j', Forall('$v', Imply(Given('$i', '$j', '$v'), Val('$i', '$j', '$v')))))
         
@@ -265,8 +263,6 @@ class KnowledgeBase:
                                   Forall('$v',
                                          Imply(And(Val('$i1', '$j', '$v'), Val('$i2', '$j', '$v'), Not(Eq('$i1', '$i2'))),
                                                Bot())))))
-        
-        
         
         # A7 (Vertical less-than constraints):
         A7 = Forall('$i', 

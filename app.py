@@ -57,12 +57,12 @@ def run_solver_with_steps(algo_key, puzzle):
     return solution, steps, step_logger.execution_time
 
 # ─── UI ────────────────────────────────────────────────────────────────────── ─
-st.markdown('<div class="hero-title">🧩 Futoshiki Solver</div>', unsafe_allow_html=True)
+st.markdown('<div class="hero-title">🧩 FUTOSHIKI SOLVER</div>', unsafe_allow_html=True)
 st.markdown('<div class="hero-sub">AI Puzzle Solver · Step-by-step Animation · KB Trace Log</div>', unsafe_allow_html=True)
 
 # ─── Sidebar ──────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("### ⚙️ Cấu hình")
+    st.markdown("### ⚙️ CONFIGURE")
 
     available = get_available_inputs()
     selected_input = st.selectbox(
@@ -70,28 +70,28 @@ with st.sidebar:
         format_func=lambda x: x.upper().replace('-', ' '),
         label_visibility="collapsed",
     )
-    st.markdown('<div class="section-title" style="margin-top:0.8rem">Thuật toán</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title" style="margin-top:0.8rem">ALGORITHM</div>', unsafe_allow_html=True)
     selected_algo_name = st.radio(
         "Algorithm", options=list(constants.ALGO_MAP.keys()), label_visibility="collapsed",
     )
 
     st.markdown("---")
-    solve_btn = st.button("▶ Solve & Capture Steps", use_container_width=True)
+    solve_btn = st.button("▶ SOLVE & CAPTURE STEPS", use_container_width=True)
 
-    st.markdown('<div class="section-title" style="margin-top:0.5rem">Tốc độ animation</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title" style="margin-top:0.5rem">ANIMATION SPEED</div>', unsafe_allow_html=True)
     speed_label = st.select_slider(
         "Speed", options=list(constants.STEP_DELAY_OPTIONS.keys()),
-        value="Vừa (0.5s)", label_visibility="collapsed",
+        value="Normal (0.5s)", label_visibility="collapsed",
     )
     step_delay = constants.STEP_DELAY_OPTIONS[speed_label]
 
     if st.session_state.solved:
         st.markdown("---")
-        st.markdown(f"**{len(st.session_state.steps)}** bước · **{st.session_state.elapsed:.1f} ms**")
+        st.markdown(f"**{len(st.session_state.steps)}** steps · **{st.session_state.elapsed:.1f} ms**")
         if st.session_state.solution:
-            st.markdown('<span class="stat-badge badge-green">✅ Solved</span>', unsafe_allow_html=True)
+            st.markdown('<span class="stat-badge badge-green"> SOLVED</span>', unsafe_allow_html=True)
         else:
-            st.markdown('<span class="stat-badge badge-red">❌ No solution</span>', unsafe_allow_html=True)
+            st.markdown('<span class="stat-badge badge-magenta"> NO SOLUTION</span>', unsafe_allow_html=True)
 
 # ─── Load Puzzle ───────────────────────────────────────────────────────────────
 try:
@@ -99,14 +99,14 @@ try:
     load_ok = True
 except Exception as e:
     load_ok = False
-    st.error(f"❌ Không load được puzzle: {e}")
+    st.error(f" Failed to load puzzle: {e}")
 
 # ─── Run Solver ────────────────────────────────────────────────────────────────
 if solve_btn and load_ok:
     st.session_state.auto_playing = False
     st.session_state.current_step = -1
     st.session_state.solve_count += 1   # force slider key change
-    with st.spinner(f"⏳ Đang chạy **{selected_algo_name}** và capture steps..."):
+    with st.spinner(f"⏳ Running **{selected_algo_name}** and capturing steps..."):
         try:
             solution, steps, elapsed = run_solver_with_steps(constants.ALGO_MAP[selected_algo_name], puzzle)
             st.session_state.steps    = steps
@@ -121,7 +121,7 @@ if solve_btn and load_ok:
             st.session_state.solved = False
 
 if st.session_state.get('solve_error'):
-    st.error(f"❌ Lỗi: {st.session_state.solve_error}")
+    st.error(f" Error: {st.session_state.solve_error}")
 
 # ─── Auto-play: cập nhật current_step trước khi bất kỳ widget nào render ─────────────────
 _trigger_rerun = False
@@ -154,16 +154,16 @@ if load_ok:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         n_given  = len(step_logger._given_cells)
         n_constr = helpers.count_constraints(puzzle)
-        title = f"📋 {selected_input.upper()}"
+        title = f" {selected_input.upper()}"
         if st.session_state.solved and cur_step:
-            title = f"🎬 Step {cur_step['step_num']} / {len(steps)}"
+            title = f" STEP {cur_step['step_num']} / {len(steps)}"
         elif st.session_state.solved and cur_idx == -1:
-            title = f"📋 {selected_input.upper()} — Initial"
+            title = f" {selected_input.upper()} — INITIAL"
         st.markdown(f"#### {title}")
         st.markdown(
-            f'<span class="stat-badge badge-purple">🔢 {puzzle.size}×{puzzle.size}</span>'
-            f'<span class="stat-badge badge-blue">📌 Given: {n_given}</span>'
-            f'<span class="stat-badge badge-orange">⚡ {n_constr} constraints</span>',
+            f'<span class="stat-badge badge-cyan">{puzzle.size}×{puzzle.size}</span>'
+            f'<span class="stat-badge badge-cyan">Given: {n_given}</span>'
+            f'<span class="stat-badge badge-cyan">{n_constr} constraints</span>',
             unsafe_allow_html=True,
         )
         st.markdown("<br>", unsafe_allow_html=True)
@@ -175,7 +175,7 @@ if load_ok:
         # ── Animation controls (only when solved) ──
         if st.session_state.solved and steps:
             st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-            st.markdown("#### 🎬 Animation Controls")
+            st.markdown("#### 🎬 ANIMATION CONTROLS")
 
             # on_change chỉ gọi khi USER kéo — không gọi khi auto-play set session_state[key]
             def _on_slider_change():
@@ -193,53 +193,53 @@ if load_ok:
 
             # Step info
             if cur_step:
-                tag_colors = {'given': 'badge-purple', 'deduced': 'badge-green', 'backtrack': 'badge-yellow'}
+                tag_colors = {'given': 'badge-magenta', 'deduced': 'badge-green', 'backtrack': 'badge-yellow'}
                 tc = tag_colors.get(cur_step['tag'], 'badge-blue')
                 st.markdown(
                     f'<span class="stat-badge {tc}">{cur_step["tag"].upper()}</span>'
-                    f'<span class="stat-badge badge-blue">Cell ({cur_step["cell"][0]},{cur_step["cell"][1]})</span>'
-                    f'<span class="stat-badge badge-orange">← {cur_step["value"]}</span>'
-                    f'<span class="stat-badge badge-purple">{cur_step["facts_count"]} facts</span>',
+                    f'<span class="stat-badge badge-cyan">CELL ({cur_step["cell"][0]},{cur_step["cell"][1]})</span>'
+                    f'<span class="stat-badge badge-cyan">VALUE {cur_step["value"]}</span>'
+                    f'<span class="stat-badge badge-purple">{cur_step["facts_count"]} FACTS</span>',
                     unsafe_allow_html=True
                 )
             elif cur_idx == -1:
-                st.markdown('<span class="stat-badge badge-blue">Initial State</span>', unsafe_allow_html=True)
+                st.markdown('<span class="stat-badge badge-cyan">INITIAL STATE</span>', unsafe_allow_html=True)
 
             st.markdown("<br>", unsafe_allow_html=True)
 
             # Control buttons
             b1, b2, b3, b4, b5 = st.columns(5)
             def _set_step(val):
-                """Chỉ update current_step — slider sẽ được sync ở đầu render tiếp theo."""
+                """Update current_step — slider will sync at next render."""
                 st.session_state.current_step = val
                 st.session_state.auto_playing = False
 
             with b1:
-                if st.button("⏮ First"):
+                if st.button("⏮ FIRST"):
                     _set_step(-1)
                     st.rerun()
             with b2:
-                if st.button("◀ Prev"):
+                if st.button("◀ PREV"):
                     _set_step(max(-1, cur_idx - 1))
                     st.rerun()
             with b3:
-                play_label = "⏸ Pause" if st.session_state.auto_playing else "▶ Play"
+                play_label = "⏸ PAUSE" if st.session_state.auto_playing else "▶ PLAY"
                 if st.button(play_label):
                     st.session_state.auto_playing = not st.session_state.auto_playing
                     st.rerun()
             with b4:
-                if st.button("Next ▶"):
+                if st.button("NEXT ▶"):
                     _set_step(min(len(steps)-1, cur_idx + 1))
                     st.rerun()
             with b5:
-                if st.button("Last ⏭"):
+                if st.button("LAST ⏭"):
                     _set_step(len(steps) - 1)
                     st.rerun()
 
             st.markdown('</div>', unsafe_allow_html=True)
 
             # ── Tabs: Step Log | KB Domains ──────────────────────────────
-            tab_log, tab_kb = st.tabs(["📋 Step Log", "🧠 KB Domains"])
+            tab_log, tab_kb = st.tabs([" STEP LOG", " KB DOMAINS"])
 
             with tab_log:
                 st.markdown('<div class="glass-card">', unsafe_allow_html=True)
@@ -248,8 +248,8 @@ if load_ok:
                 n_deduced_steps  = sum(1 for s in steps if s['tag'] == 'deduced')
                 n_backtrack_steps= sum(1 for s in steps if s['tag'] == 'backtrack')
                 st.markdown(
-                    f'<span class="stat-badge badge-blue">{total} bước</span>'
-                    f'<span class="stat-badge badge-purple">{n_given_steps} given</span>'
+                    f'<span class="stat-badge badge-cyan">{total} steps</span>'
+                    f'<span class="stat-badge badge-magenta">{n_given_steps} given</span>'
                     f'<span class="stat-badge badge-green">{n_deduced_steps} deduced</span>'
                     + (f'<span class="stat-badge badge-yellow">{n_backtrack_steps} backtrack</span>' if n_backtrack_steps else ''),
                     unsafe_allow_html=True
@@ -264,21 +264,21 @@ if load_ok:
 
             with tab_kb:
                 st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+                st.markdown(
+                    '<div style="font-size:0.72rem;color:#c77dff;margin-bottom:0.5rem;font-family:JetBrains Mono,monospace;text-shadow:0 0 5px #9d4edd;">'
+                    '🟪 GIVEN &nbsp; 🟩 SOLVED &nbsp; 🟨 ACTIVE &nbsp; 🟧 NARROWED &nbsp; ··· FULL</div>',
+                    unsafe_allow_html=True
+                )
                 if cur_step:
                     # Domain stats
                     snap = cur_step['domains_snapshot']
                     n_determined = sum(1 for d in snap.values() if len(d) == 1)
                     n_total_cells = puzzle.size * puzzle.size
                     st.markdown(
-                        f'<span class="stat-badge badge-green">{n_determined}/{n_total_cells} cells xác định</span>'
+                        f'<span class="stat-badge badge-green">{n_determined}/{n_total_cells} cells determined</span>'
                         f'<span class="stat-badge badge-purple">{cur_step["facts_count"]} facts in KB</span>',
                         unsafe_allow_html=True
                     )
-                st.markdown(
-                    '<div style="font-size:0.72rem;color:#64748b;margin-bottom:0.5rem;font-family:JetBrains Mono,monospace;">'
-                    '🟣 Given &nbsp; 🟢 Solved &nbsp; 🟡 Active &nbsp; 🟠 Narrowed &nbsp; ··· Full</div>',
-                    unsafe_allow_html=True
-                )
                 st.markdown(
                     visualRender.render_kb_domains_html(puzzle, cur_step, highlight_cell=active_cell),
                     unsafe_allow_html=True
@@ -288,31 +288,31 @@ if load_ok:
         else:
             # ── Before solving: hint panel ──
             st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-            st.markdown("#### 💡 Hướng dẫn sử dụng")
+            st.markdown("####  INSTRUCTIONS FOR USE")
             st.markdown("""
-Nhấn **▶ Solve & Capture Steps** ở sidebar để bắt đầu.
+**Press ▶ Solve & Capture Steps** in the sidebar to start.
 
-**Sau khi solve:**
-- Dùng slider hoặc nút **◀ / ▶** để duyệt từng bước
-- Nhấn **▶ Play** để auto-play animation
-- Tab **📋 Step Log** — xem log từng bước giải
-- Tab **🧠 KB Domains** — xem trạng thái domain KB tại mỗi bước
+**After solving:**
+- Use the slider or arrow keys **◀ / ▶** to step through
+- Press **▶ Play** for auto-play animation
+- Tab ** Step Log** – to view step-by-step solutions
+- Tab ** KB Domains** – to view KB domain status at each step
 
-**Màu sắc grid:**
+**Grid Legend:**
 | | |
 |---|---|
-| 🟣 Tím | Ô given (đề cho sẵn) |
-| 🟢 Xanh | Ô đã giải được |
-| 🟡 Vàng | Ô đang được gán (active step) |
+| 🟪 | Given (provided in the puzzle) |
+| 🟩 | Solved (found solutions) |
+| 🟨 | Active (currently being processed) |
 
-**Màu sắc KB Domains:**
+**KB Legend:**
 | | |
 |---|---|
-| 🟣 Tím | Given — domain cố định |
-| 🟢 Xanh | Solved — đã xác định |
-| 🟡 Vàng | Active — vừa gán ở bước này |
-| 🟠 Cam | Narrowed — domain đã bị thu hẹp |
-| ··· | Full domain {1..N} |
+| 🟪 | Given – fixed domain |
+| 🟩 | Solved – confirmed solution |
+| 🟨 | Active – processed in this step |
+| 🟧 | Narrowed – domain narrowed down |
+| ··· | Full domain (1...N) |
 """)
             st.markdown('</div>', unsafe_allow_html=True)
 

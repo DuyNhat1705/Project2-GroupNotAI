@@ -1,11 +1,12 @@
-
 import time
 from algorithms.base_algorithm import BaseAlgorithm
 from utils.logger import step_logger
+
 class Backtracking(BaseAlgorithm):
 
     def __init__(self, params = None):
         super().__init__("Backtracking", params)
+
     def isValid(self, num, solution, problem, i, j, n):
         # Same num check
         for x in range(n):
@@ -33,6 +34,7 @@ class Backtracking(BaseAlgorithm):
             elif (problem.VerticalConstraints[i - 1][j] == -1) and (num > solution[i - 1][j]):
                 return False
         return True
+    
     def recursion(self, solution, problem, i, j, n):
         indexCol = (j + 1)%n
         indexRow = i + (j + 1)//n
@@ -52,6 +54,7 @@ class Backtracking(BaseAlgorithm):
             if (i == n - 1) and (j == n - 1):
                 return True
             return self.recursion(solution, problem, indexRow, indexCol, n)
+        
     def solve(self, problem):
         # Implement the backtracking algorithm here
         n = problem.size

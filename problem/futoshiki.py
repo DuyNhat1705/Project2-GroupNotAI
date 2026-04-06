@@ -55,9 +55,10 @@ class Futoshiki():
         self.solution = solution
 
     def writeFile(self):
-        if (self.solution == None):
+        if not self.solution:
             print("The solution is not existent")
             return
+        
         with open(self.output_path, 'w', encoding = "utf-8") as f:
             for i in range(self.size):
                 for j in range(self.size):
@@ -154,9 +155,12 @@ class Futoshiki():
                     else:
                         print(" ", end = "   ")
                 print()
+
     def printFutoshikiResult(self):
-        if self.solution == None:
+        if not self.solution:
             print("The solution is not existent")
+            return
+
         for i in range(self.size):
             for j in range(self.size):
                 print(self.solution[i][j], end = ' ')
