@@ -277,11 +277,12 @@ class AStar(BaseAlgorithm):
                     end_time = time.perf_counter()
                     step_logger.execution_time = (end_time - start_time) * 1000
                     step_logger.memory_usage = sys.getsizeof(pq) / 1024
-                    '''
+
+                    
                     print("execution_time", f"{end_time - start_time:.4f}s")
                     print("nodes_expanded", counter)
                     print("memory_usage", f"{sys.getsizeof(pq) / 1024:.2f} KB")
-                    '''
+                    
                     
                     print(f"Goal found!")
                     return curr_grid

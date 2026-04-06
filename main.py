@@ -6,7 +6,7 @@ from algorithms.algorithm_factory import get_algorithm
 
 def main():
     algorithm = get_algorithm('astar')
-    problem = Futoshiki('input-07')
+    problem = Futoshiki('input-09')
     solution = algorithm.solve(problem)
     problem.setSolution(solution)
     problem.printFutoshikiResult()

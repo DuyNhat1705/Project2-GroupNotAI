@@ -1,6 +1,6 @@
 import time
 from algorithms.base_algorithm import BaseAlgorithm
-from algorithms.groundKB import KnowledgeBase
+from algorithms.logic import KnowledgeBase
 from utils.logger import step_logger
 
 
