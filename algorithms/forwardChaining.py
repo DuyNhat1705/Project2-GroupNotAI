@@ -1,6 +1,4 @@
 from algorithms.base_algorithm import BaseAlgorithm
-from algorithms.groundKB import KnowledgeBase
-
 
 class ForwardChaining(BaseAlgorithm):
 

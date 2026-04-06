@@ -469,7 +469,7 @@ class KnowledgeBase:
             And(
                 LessH('$i', '$j'),
                 Atom('NextCol', '$j', '$j_next'),
-                Given('$i', '$j_next', '$v2'),  # <-- CHANGED: Look at the actual board, don't guess!
+                Given('$i', '$j_next', '$v2'),
                 Atom('Less', '$v1', '$v2')
             ),
             Val('$i', '$j', '$v1')
@@ -482,7 +482,7 @@ class KnowledgeBase:
             And(
                 Atom('NextCol', '$j_prev', '$j'),  # Find the column to the left
                 LessH('$i', '$j_prev'),  # Check if it has a '<'
-                Given('$i', '$j_prev', '$v1'),  # <-- CHANGED
+                Given('$i', '$j_prev', '$v1'),  #
                 Atom('Less', '$v1', '$v2')  # Ensure less-than
             ),
             Val('$i', '$j', '$v2')
@@ -494,7 +494,7 @@ class KnowledgeBase:
             And(
                 GreaterH('$i', '$j'),
                 Atom('NextCol', '$j', '$j_next'),
-                Given('$i', '$j_next', '$v2'),  # <-- CHANGED
+                Given('$i', '$j_next', '$v2'),
                 Atom('Less', '$v2', '$v1')  # order flipped
             ),
             Val('$i', '$j', '$v1')
@@ -506,7 +506,7 @@ class KnowledgeBase:
             And(
                 Atom('NextCol', '$j_prev', '$j'),  # find the left col
                 GreaterH('$i', '$j_prev'),  # Check if it has a '>'
-                Given('$i', '$j_prev', '$v1'),  # <-- CHANGED
+                Given('$i', '$j_prev', '$v1'),
                 Atom('Less', '$v2', '$v1')  # Ensure constraint
             ),
             Val('$i', '$j', '$v2')
@@ -518,7 +518,7 @@ class KnowledgeBase:
             And(
                 LessV('$i', '$j'),
                 Atom('NextRow', '$i', '$i_next'),
-                Given('$i_next', '$j', '$v2'),  # <-- CHANGED
+                Given('$i_next', '$j', '$v2'),
                 Atom('Less', '$v1', '$v2')
             ),
             Val('$i', '$j', '$v1')
@@ -530,7 +530,7 @@ class KnowledgeBase:
             And(
                 Atom('NextRow', '$i_prev', '$i'),  # Find the row above us
                 LessV('$i_prev', '$j'),  # Check if it has a '^'
-                Given('$i_prev', '$j', '$v1'),  # <-- CHANGED
+                Given('$i_prev', '$j', '$v1'),
                 Atom('Less', '$v1', '$v2')
             ),
             Val('$i', '$j', '$v2')
@@ -542,7 +542,7 @@ class KnowledgeBase:
             And(
                 GreaterV('$i', '$j'),
                 Atom('NextRow', '$i', '$i_next'),
-                Given('$i_next', '$j', '$v2'),  # <-- CHANGED
+                Given('$i_next', '$j', '$v2'),
                 Atom('Less', '$v2', '$v1')
             ),
             Val('$i', '$j', '$v1')
@@ -554,7 +554,7 @@ class KnowledgeBase:
             And(
                 Atom('NextRow', '$i_prev', '$i'),
                 GreaterV('$i_prev', '$j'),
-                Given('$i_prev', '$j', '$v1'),  # <-- CHANGED
+                Given('$i_prev', '$j', '$v1'),
                 Atom('Less', '$v2', '$v1')
             ),
             Val('$i', '$j', '$v2')
