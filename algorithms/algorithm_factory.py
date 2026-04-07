@@ -3,6 +3,7 @@ from algorithms.backTracking import Backtracking
 from algorithms.bruteForce import BruteForce
 from algorithms.forwardChaining import ForwardChaining
 from algorithms.backwardChaining import BackwardChaining
+from algorithms.SAT_solver import SATSolver
 
 def get_algorithm(name):
     algoDict = {
@@ -19,7 +20,9 @@ def get_algorithm(name):
         "bt": Backtracking,
 
         "bruteforce": BruteForce,
-        "bf": BruteForce
+        "bf": BruteForce,
+
+        "sat": SATSolver
     }
     if name not in algoDict:
         raise ValueError(f"Algorithm '{name}' not found. Available: {list(algoDict.keys())}")

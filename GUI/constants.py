@@ -4,6 +4,7 @@ ALGO_MAP = {
     "Backtracking": "bt",
     "Brute Force": "bf",
     "A* Search": "astar",
+    "SAT Solver": "sat"
 }
 
 STEP_DELAY_OPTIONS = {
