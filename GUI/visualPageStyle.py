@@ -118,8 +118,10 @@ def loadPageLayout():
     
     /* ── Futoshiki Grid - Neon Purple & Magenta ── */
     .futoshiki-table { 
+        table-layout: fixed;
         border-collapse: collapse; 
-        margin: 0 auto; 
+        margin: 0 auto;
+        width: auto;
         font-family: 'JetBrains Mono', monospace;
     }
     
