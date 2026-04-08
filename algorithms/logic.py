@@ -478,7 +478,7 @@ class KnowledgeBase:
             And(
                 Atom('NextCol', '$j_prev', '$j'),  # Find the column to the left
                 LessH('$i', '$j_prev'),  # Check if it has a '<'
-                Given('$i', '$j_prev', '$v1'),  #
+                Given('$i', '$j_prev', '$v1'),
                 Atom('Less', '$v1', '$v2')  # Ensure less-than
             ),
             Val('$i', '$j', '$v2')
