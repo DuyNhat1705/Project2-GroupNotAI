@@ -22,6 +22,7 @@ def init_state():
         "auto_playing": False,
         "solved": False,
         "elapsed": 0.0, # thời gian giải
+        "memory": 0.0,
         "solve_error": None,
         "last_input": None,
         "last_algo": None,
@@ -152,7 +153,7 @@ if load_ok:
     # ── LEFT: Grid ───────────────────────────────────────────────────────────
     with col_grid:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        n_given  = len(step_logger._given_cells)
+        n_given  = helpers.count_given(puzzle)
         n_constr = helpers.count_constraints(puzzle)
         title = f" {selected_input.upper()}"
         if st.session_state.solved and cur_step:

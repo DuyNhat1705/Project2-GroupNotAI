@@ -1,20 +1,21 @@
 from algorithms.base_algorithm import BaseAlgorithm
-
+from utils.logger import step_logger
+import time
+import sys
 class BruteForce(BaseAlgorithm):
     def __init__(self, params = None):
         super().__init__("Brute Force", params)
     def isValid(self, solution, problem, n):
         # Same num check
+        row_masks = [0] * n
+        col_masks = [0] * n
         for i in range(n):
-            rowCheck = [False] * (n+1)
-            colCheck = [False] * (n+1)
             for j in range(n):
-                if rowCheck[solution[i][j]]:
+                num = solution[i][j]
+                if (row_masks[i] & (1 << num)) or (col_masks[j] & (1 << num)):
                     return False
-                rowCheck[solution[i][j]] = True
-                if colCheck[solution[j][i]]:
-                    return False
-                colCheck[solution[j][i]] = True
+                row_masks[i] |= (1 << num)
+                col_masks[j] |= (1 << num)
         # Constraint Check
         for i in range(n):
             for j in range(n):
@@ -47,11 +48,13 @@ class BruteForce(BaseAlgorithm):
         if solution[i][j] == 0:
             for num in range(1, n + 1):
                 solution[i][j] = num
+                step_logger.log_step(i, j, num, tag = "deduced", domains = step_logger.grid_to_domains(solution))
                 if (i == n - 1) and (j == n - 1):
                     return self.isValid(solution, problem, n)
                 if self.recursion(solution, problem, indexRow, indexCol, n):
                     return True
                 solution[i][j] = 0
+                step_logger.log_step(i, j, 0, tag = "backtrack", domains = step_logger.grid_to_domains(solution))
             return False
         else:
             if (i == n - 1) and (j == n - 1):
@@ -60,5 +63,9 @@ class BruteForce(BaseAlgorithm):
     def solve(self, problem):
         n = problem.size
         solution = problem.grid
+        start_time = time.perf_counter()
         self.recursion(solution, problem, 0, 0, n)
+        end_time = time.perf_counter()
+        step_logger.execution_time = (end_time - start_time) * 1000
+        step_logger.memory_usage = sys.getsizeof(solution)
         return solution
