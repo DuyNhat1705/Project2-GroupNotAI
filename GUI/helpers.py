@@ -1,9 +1,9 @@
 # Hàm chuyển đổi ký hiệu constraint
 def h_symbol(c):
-    return '<' if c == 1 else ('>' if c == -1 else '')
+    return '<' if c == 1 else ('>' if c == -1 else '&nbsp;')
 
 def v_symbol(c):
-    return '∧' if c == 1 else ('∨' if c == -1 else '')  
+    return '∧' if c == 1 else ('∨' if c == -1 else '&nbsp;')  
 
 # Đếm tổng số lượng constraint
 def count_constraints(puzzle):

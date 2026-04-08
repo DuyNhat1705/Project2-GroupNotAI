@@ -38,7 +38,10 @@ init_state()
 # Nên mỗi lần bấm Solve → solve_count tăng → slider_key thay đổi → slider được tạo lại từ đầu, không bị giữ giá trị bước cũ từ lần giải trước.
 slider_key = f"step_slider_{st.session_state.solve_count}"
 # f-string của Python để tạo chuỗi động thôi. Ví dụ: nếu solve_count = 0, slider_key = "step_slider_0". Nếu solve_count = 1, slider_key = "step_slider_1", v.v. 
-
+def reset_puzzle_state():
+    st.session_state.current_step = -1
+    st.session_state.solved = False
+    st.session_state.auto_playing = False
 # ─── Helper Functions ──────────────────────────────────────────────────────────
 def get_available_inputs(): # Lấy danh sách các file input có sẵn trong thư mục INPUTS_DIR và sort
     return sorted([f.replace('.txt', '') for f in os.listdir(INPUTS_DIR)
@@ -69,6 +72,7 @@ with st.sidebar:
     selected_input = st.selectbox(
         "Puzzle", options=available,
         format_func=lambda x: x.upper().replace('-', ' '),
+        on_change=reset_puzzle_state,
         label_visibility="collapsed",
     )
     st.markdown('<div class="section-title" style="margin-top:0.8rem">ALGORITHM</div>', unsafe_allow_html=True)
@@ -142,7 +146,8 @@ st.session_state[slider_key] = st.session_state.current_step
 
 # ─── Main Layout ───────────────────────────────────────────────────────────────
 if load_ok:
-    col_grid, col_right = st.columns([1, 1.3], gap="large")
+    visualRender.apply_grid_size(puzzle.size)
+    col_grid, col_right = st.columns([2.5, 1], gap="large")
 
     # ── Current display state ────────────────────────────────────────────────
     steps = st.session_state.steps
@@ -210,30 +215,32 @@ if load_ok:
 
             # Control buttons
             b1, b2, b3, b4, b5 = st.columns(5)
+            row1_cols = st.columns(3)
+            row2_cols = st.columns(2)
             def _set_step(val):
                 """Update current_step — slider will sync at next render."""
                 st.session_state.current_step = val
                 st.session_state.auto_playing = False
 
-            with b1:
-                if st.button("⏮ FIRST"):
+            with row1_cols[0]:
+                if st.button("⏮ FIRST",use_container_width=True):
                     _set_step(-1)
                     st.rerun()
-            with b2:
-                if st.button("◀ PREV"):
+            with row1_cols[1]:
+                if st.button("◀ PREV",use_container_width=True):
                     _set_step(max(-1, cur_idx - 1))
                     st.rerun()
-            with b3:
-                play_label = "⏸ PAUSE" if st.session_state.auto_playing else "▶ PLAY"
-                if st.button(play_label):
-                    st.session_state.auto_playing = not st.session_state.auto_playing
-                    st.rerun()
-            with b4:
-                if st.button("NEXT ▶"):
+            with row1_cols[2]:
+                if st.button("NEXT ▶",use_container_width=True):
                     _set_step(min(len(steps)-1, cur_idx + 1))
                     st.rerun()
-            with b5:
-                if st.button("LAST ⏭"):
+            with row2_cols[0]:
+                play_label = "⏸ PAUSE" if st.session_state.auto_playing else "▶ PLAY"
+                if st.button(play_label,use_container_width=True):
+                    st.session_state.auto_playing = not st.session_state.auto_playing
+                    st.rerun()
+            with row2_cols[1]:
+                if st.button("LAST ⏭",use_container_width=True):
                     _set_step(len(steps) - 1)
                     st.rerun()
 
