@@ -4,12 +4,24 @@ import time
 import sys
 from utils.logger import step_logger
 
+
 class AStar(BaseAlgorithm):
     def __init__(self, params = None):
         self.remaining = 0
         super().__init__("A*", params)  
         
     def constraint(self, problem):
+        """
+        Computes a comprehensive constraint grid for all cells.
+
+        Args:
+            problem (tuple): The original horizontal and vertical constraint definitions.
+
+        Returns:
+            list[list]: A grid where each cell contains its specific logic or 
+                        numerical constraints based on the initial problem.
+        """
+        
         rows = len(problem.grid)       
         cols = len(problem.grid[0])    
         max_val = rows
@@ -114,6 +126,24 @@ class AStar(BaseAlgorithm):
         return i, j, c_grid
 
     def deep_propagate(self, problem, temp_grid, temp_c_grid, start_row, start_col, start_value):
+        """
+        Prunes search branches that violate First-Order Logic (FOL) constraints.
+
+        This method performs constraint propagation starting from a specific cell 
+        assignment to eliminate invalid states in the search space.
+
+        Args:
+            problem (tuple): The original horizontal and vertical constraint grids.
+            temp_grid (list[list]): Current grid state after the new value assignment.
+            temp_c_grid (list[list]): Current constraint grid state after the assignment.
+            start_row (int): Row index of the cell where propagation begins.
+            start_col (int): Column index of the cell where propagation begins.
+            start_value (int/str): The value assigned to the starting cell.
+
+        Returns:
+            tuple/bool: The updated (grid, constraint_grid) or False if a violation is detected.
+        """
+
         n = len(temp_grid)
 
         queue = [(start_row, start_col, start_value)]
@@ -263,6 +293,23 @@ class AStar(BaseAlgorithm):
         return ac3_score, dead_end
 
     def heuristic(self, problem, problem_grid, constraint_grid, row, col, value, current_remaining, option = 3):
+        """
+        Calculates the heuristic value for a specific grid configuration.
+
+        Args:
+            problem (tuple): The original constraint grids (Horizontal, Vertical).
+            problem_grid (list[list]): The current state/values of the grid.
+            constraint_grid (list[list]): The current state of the constraints applied.
+            row (int): Row index of the cell being evaluated.
+            col (int): Column index of the cell being evaluated.
+            value (int): The value assigned to the cell to trigger evaluation.
+            current_remaining (int): Number of remaining unassigned cells or possible values.
+            option (str/int): The specific heuristic method to be used (e.g., 'MRV', 'Degree').
+
+        Returns:
+            float/int: The calculated heuristic score for the given state
+        """
+
         rows = len(problem_grid)       
         cols = len(problem_grid[0])    
         
@@ -299,6 +346,8 @@ class AStar(BaseAlgorithm):
         return row, col, value, h_value, temp_grid, temp_c_grid, remaining_cells        
 
     def getValidMoves(self, row, col, c_grid):
+        """Get all the valid moves from constraints grid"""
+
         n = len(c_grid)
         valid = []
 
@@ -311,6 +360,7 @@ class AStar(BaseAlgorithm):
     def solve(self, problem):
         print("Running A* algorithm...")
         start_time = time.perf_counter()
+        option = 3
 
         # Declared nessesscary variable
         pq = []
@@ -320,7 +370,7 @@ class AStar(BaseAlgorithm):
         valid_moves = self.getValidMoves(row, col, c_grid)
 
         for v in valid_moves:
-            _, _, _, h_value, temp_grid, temp_c_grid, rem = self.heuristic(problem, problem.grid, c_grid, row, col, v, self.remaining, 3)
+            _, _, _, h_value, temp_grid, temp_c_grid, rem = self.heuristic(problem, problem.grid, c_grid, row, col, v, self.remaining, option)
             
             # Apply pruning if violate FOL constraints
             if h_value != float("inf"): 
@@ -372,7 +422,7 @@ class AStar(BaseAlgorithm):
 
             # Getting all the valid moves from the cell
             for v in valid_moves_for_next_cell:
-                _, _, _, h_value, next_grid, next_c_grid, next_rem = self.heuristic(problem, curr_grid, curr_c_grid, next_row, next_col, v, curr_rem, 3)
+                _, _, _, h_value, next_grid, next_c_grid, next_rem = self.heuristic(problem, curr_grid, curr_c_grid, next_row, next_col, v, curr_rem, option)
                 
                 # Apply pruning if violate FOL constraints
                 if h_value != float("inf"): 
