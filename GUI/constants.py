@@ -13,3 +13,4 @@ STEP_DELAY_OPTIONS = {
     "Fast (0.2s)": 0.2, 
     "Very Fast (0.05s)": 0.05
 }
+TIME_OUT = 15.0 # seconds

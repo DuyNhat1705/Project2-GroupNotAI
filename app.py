@@ -7,7 +7,7 @@ from GUI import constants, visualPageStyle, helpers, visualRender
 
 from problem.futoshiki import Futoshiki
 from algorithms.algorithm_factory import get_algorithm
-from utils.logger import step_logger
+from utils.logger import step_logger, SolverTimeoutError
 
 visualPageStyle.loadPageLayout()  # Load page layout and CSS style
 # ─── Constants ────────────────────────────────────────────────────────────────
@@ -48,13 +48,13 @@ def get_available_inputs(): # Lấy danh sách các file input có sẵn trong t
                    if f.startswith('input-') and f.endswith('.txt')])
 
 #Hàm này chạy solver và ghi lại từng bước giải bằng kỹ thuật monkeypatching.
-def run_solver_with_steps(algo_key, puzzle):
+def run_solver_with_steps(algo_key, puzzle, time_out):
     """
     Chạy solver và thu thập từng bước giải qua step_logger singleton.
     Tất cả algorithm (FC, BT, A*, BC) tự log bằng step_logger.log_step().
     Mỗi step: { step_num, action, tag, cell, value, domains_snapshot, facts_count }
     """
-    step_logger.reset(puzzle)
+    step_logger.reset(puzzle, time_out=time_out)
     algo = get_algorithm(algo_key)
     solution = algo.solve(puzzle)
     steps = list(step_logger.steps)
@@ -77,7 +77,7 @@ with st.sidebar:
     )
     st.markdown('<div class="section-title" style="margin-top:0.8rem">ALGORITHM</div>', unsafe_allow_html=True)
     selected_algo_name = st.radio(
-        "Algorithm", options=list(constants.ALGO_MAP.keys()), label_visibility="collapsed",
+        "Algorithm", options=list(constants.ALGO_MAP.keys()),on_change = reset_puzzle_state, label_visibility="collapsed",
     )
 
     st.markdown("---")
@@ -113,7 +113,7 @@ if solve_btn and load_ok:
     st.session_state.solve_count += 1   # force slider key change
     with st.spinner(f"⏳ Running **{selected_algo_name}** and capturing steps..."):
         try:
-            solution, steps, elapsed = run_solver_with_steps(constants.ALGO_MAP[selected_algo_name], puzzle)
+            solution, steps, elapsed = run_solver_with_steps(constants.ALGO_MAP[selected_algo_name], puzzle, time_out=constants.TIME_OUT)
             st.session_state.steps    = steps
             st.session_state.solution = solution
             st.session_state.elapsed  = elapsed
@@ -121,6 +121,9 @@ if solve_btn and load_ok:
             st.session_state.solve_error = None
             st.session_state.last_input  = selected_input
             st.session_state.last_algo   = selected_algo_name
+        except SolverTimeoutError as e:
+            st.session_state.solved = False
+            st.error(f"🛑 {str(e)}")
         except Exception as e:
             st.session_state.solve_error = str(e)
             st.session_state.solved = False
