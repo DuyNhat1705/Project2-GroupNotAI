@@ -85,7 +85,7 @@ class AStar(BaseAlgorithm):
                 val_top = problem.grid[r][c]
                 val_bottom = problem.grid[r + 1][c]
                 
-                # Top < Botto
+                # Top < Bottom
                 if relation == 1:
                     c_grid[r][c].add(max_val)
                     c_grid[r + 1][c].add(1)
@@ -154,7 +154,8 @@ class AStar(BaseAlgorithm):
             r, c, v = queue.pop(0)
 
             for i in range(n):
-                if temp_grid[i][c] == 0:
+                # Skip the current cell itself
+                if i != r and temp_grid[i][c] == 0:
                     if v not in temp_c_grid[i][c]:
                         temp_c_grid[i][c].add(v)
 
@@ -166,12 +167,9 @@ class AStar(BaseAlgorithm):
                         queue.append((i, c, force_move))
                         temp_grid[i][c] = force_move
                         ac3_score += 1
-                    
-                    # If there are no values left, continue expanding is not needed
-                    elif constraints == n:
-                        dead_end = True
 
-                if temp_grid[r][i] == 0:
+                # Skip the current cell itself
+                if i != c and temp_grid[r][i] == 0:
                     if v not in temp_c_grid[r][i]:
                         temp_c_grid[r][i].add(v)
 
@@ -183,10 +181,6 @@ class AStar(BaseAlgorithm):
                         queue.append((r, i, force_move))
                         temp_grid[r][i] = force_move
                         ac3_score += 1
-
-                    # If there are no values left, continue expanding is not needed
-                    elif constraints == n:
-                        dead_end = True
 
             # Checking all four directions for constraint
             # Horizontal
@@ -209,10 +203,6 @@ class AStar(BaseAlgorithm):
                     queue.append((r, c - 1, force_move))
                     temp_grid[r][c - 1] = force_move
                     ac3_score += 1
-                    
-                # If there are no values left, continue expanding is not needed
-                elif constraints == n:
-                    dead_end = True
 
             # Right cell
             if c < n - 1 and temp_grid[r][c + 1] == 0:
@@ -233,10 +223,6 @@ class AStar(BaseAlgorithm):
                     queue.append((r, c + 1, force_move))
                     temp_grid[r][c + 1] = force_move
                     ac3_score += 1
-                    
-                # If there are no values left, continue expanding is not needed
-                elif constraints == n:
-                    dead_end = True
 
             # Vertical
             # Up cell
@@ -258,10 +244,6 @@ class AStar(BaseAlgorithm):
                     queue.append((r - 1, c, force_move))
                     temp_grid[r - 1][c] = force_move
                     ac3_score += 1
-                    
-                # If there are no values left, continue expanding is not needed
-                elif constraints == n:
-                    dead_end = True
 
             # Down cell
             if r < n - 1 and hasattr(problem, 'VerticalConstraints') and temp_grid[r + 1][c] == 0:
@@ -282,15 +264,14 @@ class AStar(BaseAlgorithm):
                     queue.append((r + 1, c, force_move))
                     temp_grid[r + 1][c] = force_move
                     ac3_score += 1
-                    
-                # If there are no values left, continue expanding is not needed
-                elif constraints == n:
-                    dead_end = True
-
-            if dead_end:
-                break
         
-        return ac3_score, dead_end
+        empty_domain_count = 0
+        for r in range(n):
+            for c in range(n):
+                if temp_grid[r][c] == 0 and len(temp_c_grid[r][c]) == n:
+                    empty_domain_count += 1
+                    
+        return ac3_score, empty_domain_count
 
     def heuristic(self, problem, problem_grid, constraint_grid, row, col, value, current_remaining, option = 3):
         """
@@ -319,15 +300,13 @@ class AStar(BaseAlgorithm):
         # Assign the value to cell
         temp_grid[row][col] = value
 
-        ac3_score, deadend = self.deep_propagate(problem, temp_grid, temp_c_grid, row, col, value) 
+        ac3_score, empty_domain_count = self.deep_propagate(problem, temp_grid, temp_c_grid, row, col, value) 
 
         remaining_cells = current_remaining - 1 - ac3_score
 
-        if deadend:
-            return row, col, value, float("inf"), temp_grid, temp_c_grid, remaining_cells
-
         if option == 1:
             h_value = remaining_cells
+            
         elif option == 2:
             additional_steps = 0
             for r in range(rows):
@@ -340,8 +319,9 @@ class AStar(BaseAlgorithm):
                             additional_steps += 1
 
             h_value = additional_steps
+
         elif option == 3:
-            h_value = -ac3_score
+            h_value = empty_domain_count
 
         return row, col, value, h_value, temp_grid, temp_c_grid, remaining_cells        
 
@@ -357,14 +337,21 @@ class AStar(BaseAlgorithm):
 
         return valid
 
-    def solve(self, problem):
-        print("Running A* algorithm...")
+    def solve(self, problem, option = 3):
+
+        if option == 1:
+            print("Running A* algorithm on Heuristic 1...")
+        elif option == 2:
+            print("Running A* algorithm on Heuristic 2...")
+        else:
+            print("Running A* algorithm on Heuristic 3...")
+
         start_time = time.perf_counter()
-        option = 3
 
         # Declared nessesscary variable
         pq = []
-        counter = 0 
+        counter = 0
+        closed = set()  # Closed set to avoid re-expanding the same state
 
         row, col, c_grid = self.constraint(problem)
         valid_moves = self.getValidMoves(row, col, c_grid)
@@ -382,6 +369,12 @@ class AStar(BaseAlgorithm):
 
         while pq:
             f_value, _, g_value, curr_grid, curr_c_grid, last_move, curr_rem = heapq.heappop(pq)
+
+            # Skip already-expanded states
+            state_key = tuple(tuple(row) for row in curr_grid)
+            if state_key in closed:
+                continue
+            closed.add(state_key)
 
             step_logger.log_step(last_move[0][0], last_move[0][1], last_move[1], tag= "deduced", domains = step_logger.grid_to_domains(curr_grid))
             

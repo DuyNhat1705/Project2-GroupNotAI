@@ -4,8 +4,8 @@ from algorithms.algorithm_factory import get_algorithm
 
 def main():
     algorithm = get_algorithm('astar')
-    problem = Futoshiki('input-07')
-    solution = algorithm.solve(problem)
+    problem = Futoshiki('input-08')
+    solution = algorithm.solve(problem, 3)
     problem.setSolution(solution)
 
     problem.writeFile()
