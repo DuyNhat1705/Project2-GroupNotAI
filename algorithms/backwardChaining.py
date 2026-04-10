@@ -10,41 +10,62 @@ class BackwardChaining(BaseAlgorithm):
         self.kb = None
         self.cnt = 0 # later assigned idx
         self.domains = None
+        self.is_solved = False
         super().__init__("Backward Chaining", params)
 
     def solve(self, problem):
+        # Init State
+        self.is_solved = False
         self.kb = KnowledgeBase(problem)
-        self.domains = self.init_domain(problem)  # Store as instance variable
+        self.domains = self.init_domain(problem)
 
         step_logger.reset(problem)
         start_time = time.perf_counter()
         print(f"Backward chaining for {problem.size}x{problem.size}...\n")
 
-        # initial scratchpad
-        domains = self.init_domain(problem)
-
-        # Log the starting clues
+        # Log starting clues and initial pruning
         for r in range(problem.size):
             for c in range(problem.size):
-                if problem.grid[r][c] != 0:
-                    step_logger.log_step(r + 1, c + 1, problem.grid[r][c], tag='given',
-                                         domains=dict(domains),
+                val = problem.grid[r][c]
+                if val != 0:
+                    step_logger.log_step(r + 1, c + 1, val, tag='given',
+                                         domains=dict(self.domains),
                                          facts_count=len(self.kb.obs_facts))
 
-        step_logger.execution_time = (time.perf_counter() - start_time) * 1000
+                    if hasattr(self, 'forward_check_kb'):
+                        self.forward_check_kb(problem, self.domains, r, c, val)
 
-        # recursive search
-        if self.backtrack_solve(problem, domains):
-            print(f"\nPuzzle Solved!\n")
-            print(step_logger.execution_time)
+        # Recursive search
+        if self.backtrack_solve(problem, self.domains):
+            self.is_solved = True
+            step_logger.execution_time = (time.perf_counter() - start_time) * 1000
+
+            # Filter out all 'Val' and 'Given' facts
+            clean_facts = []
+            for fact in self.kb.obs_facts:
+                if hasattr(fact, 'name') and fact.name in ['Val', 'Given']:
+                    continue  # Throw it in the trash
+                clean_facts.append(fact)
+
+            self.kb.obs_facts = clean_facts
+
+            # Rebuild the KB leaning on solved grid
+            for r in range(problem.size):
+                for c in range(problem.size):
+                    val = problem.grid[r][c]
+                    self.kb.obs_facts.append(Atom('Val', r + 1, c + 1, int(val)))
+
+            print(f"\nPuzzle Solved in {step_logger.execution_time:.2f}ms!\n")
             problem.printFutoshiki()
             return problem.grid
         else:
+            step_logger.execution_time = (time.perf_counter() - start_time) * 1000
             print("\nFAILED: The engine could not find a valid solution.")
             return problem.grid
 
+
     def backtrack_solve(self, problem, domains):
-        # get the MRV cell
+        # Get the MRV cell
         cell = self.get_mrv_cell(domains)
 
         if cell is None:
@@ -52,7 +73,6 @@ class BackwardChaining(BaseAlgorithm):
 
         row, col = cell
 
-        # Ask FOL Engine for candidates
         query = Atom('Val', row + 1, col + 1, Var('$v'))
         ans = list(self.fol_bc_ask(query))
 
@@ -63,45 +83,41 @@ class BackwardChaining(BaseAlgorithm):
             raw_val_expr = Substitute(theta, Var('$v'))
             val = self.unpack_val(raw_val_expr)
 
-            # Only try value if it is in valid domain
+            # Logic Generation and Domain Pruning
+            # only proceed if the SLD guess survives the Forward Check
             if val in domains[(row, col)] and val not in unique_vals:
                 unique_vals.add(val)  # Mark as seen
 
-                if self.is_safe(problem, row, col, val):
-                    # Try placing and Forward Check
-                    valid_flag, pruned_list = self.forward_check_kb(problem, domains, row, col, val)
+                valid_flag, pruned_list = self.forward_check_kb(problem, domains, row, col, val)
 
-                    if valid_flag:
-                        # if safe, commit to the board
-                        problem.grid[row][col] = val
-                        fact = Atom('Given', row + 1, col + 1, val)
-                        self.kb.obs_facts.append(fact)
+                if valid_flag:
+                    # Commit to the board
+                    problem.grid[row][col] = val
+                    fact = Atom('Given', row + 1, col + 1, val)
+                    self.kb.obs_facts.append(fact)
 
-                        # Log attempt
-                        step_logger.log_step(row + 1, col + 1, val, tag='try',
-                                             domains=dict(domains),
-                                             facts_count=len(self.kb.obs_facts))
+                    step_logger.log_step(row + 1, col + 1, val, tag='try',
+                                         domains=dict(domains),
+                                         facts_count=len(self.kb.obs_facts))
 
-                        # Temporarily remove this cell from the domains
-                        saved_domain = domains.pop((row, col))
+                    saved_domain = domains.pop((row, col))
 
-                        # Move forward
-                        if self.backtrack_solve(problem, domains):
-                            return True
+                    # Move forward recursively
+                    if self.backtrack_solve(problem, domains):
+                        return True
 
-                        # Restore to the domains dict
-                        domains[(row, col)] = saved_domain
-                        problem.grid[row][col] = 0
-                        self.kb.obs_facts.remove(fact)
+                    # --- BACKTRACK ---
+                    domains[(row, col)] = saved_domain
+                    problem.grid[row][col] = 0
+                    self.kb.obs_facts.remove(fact)
 
-                        # Log the backtrack 
-                        step_logger.log_step(row + 1, col + 1, 0, tag='backtrack',
-                                             domains=dict(domains),
-                                             facts_count=len(self.kb.obs_facts))
+                    step_logger.log_step(row + 1, col + 1, 0, tag='backtrack',
+                                         domains=dict(domains),
+                                         facts_count=len(self.kb.obs_facts))
 
-                    # Put back num removed from domains
-                    for (pr, pc, pv) in pruned_list:
-                        domains[(pr, pc)].add(pv)
+                # Put back numbers removed from neighbors' domains
+                for (pr, pc, pv) in pruned_list:
+                    domains[(pr, pc)].add(pv)
 
         return False
 
@@ -301,72 +317,8 @@ class BackwardChaining(BaseAlgorithm):
 
         return True, pruned
 
-    def is_safe(self, problem, row, col, val):
-        """
-        Safety check with Ground KB.
-        """
-        R = row + 1
-        C = col + 1
-        V = int(val)
-
-        # Hypothetical state: (r, c, v)
-        hypo_state = set()
-
-        # Add the new guess to be tested
-        hypo_state.add((R, C, V))
-
-        # Add all existing values in KB
-        for fact in self.kb.obs_facts:
-            if hasattr(fact, 'name') and fact.name in ['Given', 'Val']:
-                # Safely extract raw int whether they are Const objects or ints
-                fact_r = int(fact.args[0].value if hasattr(fact.args[0], 'value') else fact.args[0])
-                fact_c = int(fact.args[1].value if hasattr(fact.args[1], 'value') else fact.args[1])
-                fact_v = int(fact.args[2].value if hasattr(fact.args[2], 'value') else fact.args[2])
-
-                hypo_state.add((fact_r, fact_c, fact_v))
-
-        # Check the Ground Rules for a contradiction
-        for rule in self.kb.ground_rules:
-            # focus Implication rules that lead to Contradiction
-            if not isinstance(rule, Imply) or not isinstance(rule.right, Bot):
-                continue
-
-            premise = rule.left
-
-            # Collect the atoms from the premise
-            if isinstance(premise, And):
-                atoms = premise.args
-            else:
-                atoms = [premise]
-
-            # Check if every atom in the premise exists in our hypothetical state
-            rule_triggers = True
-            for a in atoms:
-                # If the rule checks other than a Val, skip
-                if a.name != 'Val':
-                    rule_triggers = False
-                    break
-
-                # Extract raw values from the rule's atom
-                a_r = int(a.args[0].value if hasattr(a.args[0], 'value') else a.args[0])
-                a_c = int(a.args[1].value if hasattr(a.args[1], 'value') else a.args[1])
-                a_v = int(a.args[2].value if hasattr(a.args[2], 'value') else a.args[2])
-
-                # If this (r, c, v) is not on the board, contradiction rule doesn't trigger
-                if (a_r, a_c, a_v) not in hypo_state:
-                    rule_triggers = False
-                    break
-
-            # If all premises matched hypothetical state, the rule triggers
-            if rule_triggers:
-                return False  # Contradiction found => NOT safe
-
-        # Survived alL rule checks
-        return True
-
 
     # --- Prolog-style Query ---
-
     def _extract_vars(self, expr):
         """Recursively finds all Var in a logic expression."""
         if isinstance(expr, Var):
@@ -378,67 +330,41 @@ class BackwardChaining(BaseAlgorithm):
             return vars_set
         return set()
 
-    def ask_prolog(self, query_atom):
-        """Executes a logical query and formats the output with Domain awareness."""
-        print(f"\n?- {query_atom}")
+    def _start_query_console(self, problem):
+        """Interactive console tied to Knowledge Base with Pre/Post Solve awareness."""
 
-        query_vars = self._extract_vars(query_atom)
-        answers = list(self.fol_bc_ask(query_atom))
+        # --- Initialization & Initial Clue Pruning ---
+        if getattr(self, 'kb', None) is None:
+            print("Initializing Knowledge Base and parsing initial clues...")
+            self.kb = KnowledgeBase(problem)
+            self.domains = self.init_domain(problem)  # Store as instance variable
 
-        if not answers:
-            print("false.")
-            return
+            # Apply initial clues on Pre-Solve scratchpad
+            for r in range(problem.size):
+                for c in range(problem.size):
+                    val = problem.grid[r][c]
+                    if val != 0:
+                        # 1-idx for the Knowledge Base
+                        fact = Atom('Val', r + 1, c + 1, int(val))
+                        if fact not in self.kb.obs_facts:
+                            self.kb.obs_facts.append(fact)
 
-        for theta in answers:
-            if not query_vars:
-                print("true ;")
-                continue
+                        # Trigger your forward checker to prune the domains
+                        # (Uses whichever method name you currently have active)
+                        if hasattr(self, 'forward_check_kb'):
+                            self.forward_check_kb(problem, self.domains, r, c, val)
+                        elif hasattr(self, 'forward_check'):
+                            self.forward_check(problem, self.domains, r, c, val)
 
-            bindings = []
-            for var_name in query_vars:
-                raw_val = Substitute(theta, Var(var_name))
-                clean_val = self.unpack_val(raw_val)
+            self.is_solved = False
 
-                # ---  Domain Reporting ---
-                if isinstance(clean_val, Var):
-                    # Check if the query was Val(Row, Col, Var)
-                    if query_atom.name == 'Val' and len(query_atom.args) == 3:
-                        try:
-                            # Extract coordinates from the original query atom
-                            r = self.unpack_val(Substitute(theta, query_atom.args[0]))
-                            c = self.unpack_val(Substitute(theta, query_atom.args[1]))
-
-                            # Look up the pruned domain from the solver's state
-                            # (r-1, c-1) to 0-idx
-                            current_domain = self.domains.get((r - 1, c - 1))
-
-                            if current_domain:
-                                # Format as a Prolog set: {1, 2, 5}
-                                clean_val = f"{{{', '.join(map(str, sorted(current_domain)))}}}"
-                            else:
-                                clean_val = "_"
-                        except:
-                            clean_val = "_"
-                    else:
-                        clean_val = "_"
-
-                bindings.append(f"{var_name} = {clean_val}")
-
-            print(", ".join(bindings) + " ;")
-
-        print("false.")
-
-    def _start_query_console(self):
-        """interactive console tied to Knowledge Base."""
-        if self.kb is None:
-            print("Error: Knowledge Base is empty")
-            return
-
-        # print brief tutorial
+        # Print tutorial and State Awareness
         print("\n" + "=" * 50)
-        print("Futoshiki Prolog-style query engine")
-        print("Variables must be Uppercase")
-        print("Type 'exit' to quit.")
+        print(" SWI-Prolog (Futoshiki Logic Engine)")
+        state_str = "SOLVED" if getattr(self, 'is_solved', False) else "UNSOLVED (Domains Loaded)"
+        print(f" Current State: {state_str}")
+        print(" Variables must be Uppercase (e.g., X, Val).")
+        print(" Type 'exit' to quit.")
         print("=" * 50)
 
         while True:
@@ -447,11 +373,15 @@ class BackwardChaining(BaseAlgorithm):
                 if user_input.lower() in ['exit', 'quit']:
                     break
 
-                # Strip the trailing period
+                # Strip trailing period
                 if user_input.endswith('.'):
                     user_input = user_input[:-1]
 
-                # Simple regex to parse things
+                # --- FIX 2: Prevent crash on empty input ---
+                if not user_input:
+                    continue
+
+                # Regex parser
                 match = re.match(r"^(\w+)\((.*)\)$", user_input)
                 if not match:
                     print("Syntax Error. Format: Predicate(arg1, arg2...)")
@@ -465,15 +395,89 @@ class BackwardChaining(BaseAlgorithm):
                 for arg in args_str:
                     arg = arg.strip()
                     if arg.isdigit():
-                        parsed_args.append(int(arg))  # integer constant
+                        parsed_args.append(int(arg))
                     elif arg[0].isupper() or arg.startswith('$'):
-                        parsed_args.append(Var(arg))  # a Variable
+                        parsed_args.append(Var(arg))
                     else:
-                        parsed_args.append(arg)  # string constant
+                        parsed_args.append(arg)
 
-                # Create the query Atom and run
+                # --- Pre-Solve Short-Circuit ---
+                # Query check: Val(int, int, Variable)
+                is_domain_query = (
+                        name == 'Val' and
+                        len(parsed_args) == 3 and
+                        isinstance(parsed_args[0], int) and
+                        isinstance(parsed_args[1], int) and
+                        isinstance(parsed_args[2], Var)
+                )
+
+                if is_domain_query and not getattr(self, 'is_solved', False):
+                    # PRE-SOLVED: Just look in domain scratchpad
+                    r, c = parsed_args[0], parsed_args[1]
+                    var_name = parsed_args[2].name
+
+                    domain = getattr(self, 'domains', {}).get((r - 1, c - 1))
+
+                    if domain:
+                        print(f"{var_name} = {{{', '.join(map(str, sorted(domain)))}}} ;")
+                    else:
+                        print("false. (Domain is empty or out of bounds)")
+
+                    print("false.")
+                    continue  # Skip the rest of the loop
+
+                # --- Post-Solve (or standard rule queries) ---
+                # Create query Atom and run full SLD Resolution
                 query = Atom(name, *parsed_args)
                 self.ask_prolog(query)
 
             except Exception as e:
                 print(f"Error executing query: {e}")
+
+    def ask_prolog(self, query_atom):
+        """Executes a logical query and formats the output with Domain awareness."""
+        print(f"\n?- {query_atom}")
+
+        query_vars = self._extract_vars(query_atom)
+        answers = list(self.fol_bc_ask(query_atom))
+
+        if not answers:
+            print("false.")
+            return
+
+        # Track printed bindings to eliminate duplicates
+        printed_bindings = set()
+
+        for theta in answers:
+            if not query_vars:
+                if "true" not in printed_bindings:
+                    print("true ;")
+                    printed_bindings.add("true")
+                continue
+
+            bindings = []
+            all_unbound = True  # Track ghost variables
+
+            for var_name in query_vars:
+                raw_val = Substitute(theta, Var(var_name))
+                clean_val = self.unpack_val(raw_val)
+
+                if isinstance(clean_val, Var):
+                    clean_val = "_"
+                else:
+                    all_unbound = False  # At least one real value exists
+
+                bindings.append(f"{var_name} = {clean_val}")
+
+            # Skip ghost proofs (e.g., C = _, R = _)
+            if all_unbound:
+                continue
+
+            binding_str = ", ".join(bindings)
+
+            # Only print if we haven't seen this exact answer yet
+            if binding_str not in printed_bindings:
+                print(binding_str + " ;")
+                printed_bindings.add(binding_str)
+
+        print("false.")
