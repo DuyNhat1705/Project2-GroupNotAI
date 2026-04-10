@@ -7,7 +7,7 @@ from GUI import constants, visualPageStyle, helpers, visualRender
 
 from problem.futoshiki import Futoshiki
 from algorithms.algorithm_factory import get_algorithm
-from utils.logger import step_logger
+from utils.logger import step_logger, SolverTimeoutError
 
 visualPageStyle.loadPageLayout()  # Load page layout and CSS style
 # ─── Constants ────────────────────────────────────────────────────────────────
@@ -38,20 +38,23 @@ init_state()
 # Nên mỗi lần bấm Solve → solve_count tăng → slider_key thay đổi → slider được tạo lại từ đầu, không bị giữ giá trị bước cũ từ lần giải trước.
 slider_key = f"step_slider_{st.session_state.solve_count}"
 # f-string của Python để tạo chuỗi động thôi. Ví dụ: nếu solve_count = 0, slider_key = "step_slider_0". Nếu solve_count = 1, slider_key = "step_slider_1", v.v. 
-
+def reset_puzzle_state():
+    st.session_state.current_step = -1
+    st.session_state.solved = False
+    st.session_state.auto_playing = False
 # ─── Helper Functions ──────────────────────────────────────────────────────────
 def get_available_inputs(): # Lấy danh sách các file input có sẵn trong thư mục INPUTS_DIR và sort
     return sorted([f.replace('.txt', '') for f in os.listdir(INPUTS_DIR)
                    if f.startswith('input-') and f.endswith('.txt')])
 
 #Hàm này chạy solver và ghi lại từng bước giải bằng kỹ thuật monkeypatching.
-def run_solver_with_steps(algo_key, puzzle):
+def run_solver_with_steps(algo_key, puzzle, time_out):
     """
     Chạy solver và thu thập từng bước giải qua step_logger singleton.
     Tất cả algorithm (FC, BT, A*, BC) tự log bằng step_logger.log_step().
     Mỗi step: { step_num, action, tag, cell, value, domains_snapshot, facts_count }
     """
-    step_logger.reset(puzzle)
+    step_logger.reset(puzzle, time_out=time_out)
     algo = get_algorithm(algo_key)
     solution = algo.solve(puzzle)
     steps = list(step_logger.steps)
@@ -69,11 +72,12 @@ with st.sidebar:
     selected_input = st.selectbox(
         "Puzzle", options=available,
         format_func=lambda x: x.upper().replace('-', ' '),
+        on_change=reset_puzzle_state,
         label_visibility="collapsed",
     )
     st.markdown('<div class="section-title" style="margin-top:0.8rem">ALGORITHM</div>', unsafe_allow_html=True)
     selected_algo_name = st.radio(
-        "Algorithm", options=list(constants.ALGO_MAP.keys()), label_visibility="collapsed",
+        "Algorithm", options=list(constants.ALGO_MAP.keys()),on_change = reset_puzzle_state, label_visibility="collapsed",
     )
 
     st.markdown("---")
@@ -109,7 +113,7 @@ if solve_btn and load_ok:
     st.session_state.solve_count += 1   # force slider key change
     with st.spinner(f"⏳ Running **{selected_algo_name}** and capturing steps..."):
         try:
-            solution, steps, elapsed = run_solver_with_steps(constants.ALGO_MAP[selected_algo_name], puzzle)
+            solution, steps, elapsed = run_solver_with_steps(constants.ALGO_MAP[selected_algo_name], puzzle, time_out=constants.TIME_OUT)
             st.session_state.steps    = steps
             st.session_state.solution = solution
             st.session_state.elapsed  = elapsed
@@ -117,6 +121,9 @@ if solve_btn and load_ok:
             st.session_state.solve_error = None
             st.session_state.last_input  = selected_input
             st.session_state.last_algo   = selected_algo_name
+        except SolverTimeoutError as e:
+            st.session_state.solved = False
+            st.error(f"🛑 {str(e)}")
         except Exception as e:
             st.session_state.solve_error = str(e)
             st.session_state.solved = False
@@ -142,7 +149,8 @@ st.session_state[slider_key] = st.session_state.current_step
 
 # ─── Main Layout ───────────────────────────────────────────────────────────────
 if load_ok:
-    col_grid, col_right = st.columns([1, 1.3], gap="large")
+    visualRender.apply_grid_size(puzzle.size)
+    col_grid, col_right = st.columns([2.5, 1], gap="large")
 
     # ── Current display state ────────────────────────────────────────────────
     steps = st.session_state.steps
@@ -210,30 +218,32 @@ if load_ok:
 
             # Control buttons
             b1, b2, b3, b4, b5 = st.columns(5)
+            row1_cols = st.columns(3)
+            row2_cols = st.columns(2)
             def _set_step(val):
                 """Update current_step — slider will sync at next render."""
                 st.session_state.current_step = val
                 st.session_state.auto_playing = False
 
-            with b1:
-                if st.button("⏮ FIRST"):
+            with row1_cols[0]:
+                if st.button("⏮ FIRST",use_container_width=True):
                     _set_step(-1)
                     st.rerun()
-            with b2:
-                if st.button("◀ PREV"):
+            with row1_cols[1]:
+                if st.button("◀ PREV",use_container_width=True):
                     _set_step(max(-1, cur_idx - 1))
                     st.rerun()
-            with b3:
-                play_label = "⏸ PAUSE" if st.session_state.auto_playing else "▶ PLAY"
-                if st.button(play_label):
-                    st.session_state.auto_playing = not st.session_state.auto_playing
-                    st.rerun()
-            with b4:
-                if st.button("NEXT ▶"):
+            with row1_cols[2]:
+                if st.button("NEXT ▶",use_container_width=True):
                     _set_step(min(len(steps)-1, cur_idx + 1))
                     st.rerun()
-            with b5:
-                if st.button("LAST ⏭"):
+            with row2_cols[0]:
+                play_label = "⏸ PAUSE" if st.session_state.auto_playing else "▶ PLAY"
+                if st.button(play_label,use_container_width=True):
+                    st.session_state.auto_playing = not st.session_state.auto_playing
+                    st.rerun()
+            with row2_cols[1]:
+                if st.button("LAST ⏭",use_container_width=True):
                     _set_step(len(steps) - 1)
                     st.rerun()
 

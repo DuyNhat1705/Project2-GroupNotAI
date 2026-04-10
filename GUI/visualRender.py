@@ -1,5 +1,5 @@
 from GUI.helpers import h_symbol, v_symbol
-
+import streamlit as st
 # Hàm này render bảng Futoshiki thành HTML để hiển thị trên giao diện
 def render_grid_html(puzzle, step=None, active_cell=None):
     """
@@ -20,7 +20,7 @@ def render_grid_html(puzzle, step=None, active_cell=None):
             if len(dom) == 1:
                 val_map[(ri-1, cj-1)] = next(iter(dom))
 
-    html = '<table class="futoshiki-table" cellspacing="5">'
+    html = '<table class="futoshiki-table" cellspacing="0">'
     for i in range(n):
         html += '<tr>'
         for j in range(n):
@@ -199,3 +199,22 @@ def render_kb_domains_html(puzzle, step, highlight_cell=None):
         html += '</tr>'
     html += '</table>'
     return html
+def apply_grid_size(grid_size):
+    # Tính toán kích thước ô dựa trên size của puzzle
+    if grid_size <= 5:
+        base_size = 52
+    elif grid_size <= 7:
+        base_size = 42
+    else:
+        base_size = 30  # Size 9x9
+
+    # Chỉ render đúng phần biến :root, CSS sẽ tự động hiểu cho các class bên dưới
+    st.markdown(f"""
+        <style>
+        :root {{
+            --cell-size: {base_size}px;
+            --h-constraint-width: calc(var(--cell-size) / 2);
+            --v-constraint-height: calc(var(--cell-size) / 2.3);
+        }}
+        </style>
+    """, unsafe_allow_html=True)

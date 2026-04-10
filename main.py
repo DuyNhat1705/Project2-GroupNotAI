@@ -1,4 +1,3 @@
-from algorithms.backwardChaining import BackwardChaining
 from problem.futoshiki import Futoshiki
 from algorithms.algorithm_factory import get_algorithm
 
@@ -6,6 +5,7 @@ def main():
     algorithm = get_algorithm('bc')
     problem = Futoshiki('input-09')
     problem.printFutoshiki()
+
     if algorithm.name == "Backward Chaining":
         algorithm._start_query_console(problem)
         solution = algorithm.solve(problem)
@@ -15,7 +15,6 @@ def main():
     else:
         solution = algorithm.solve(problem)
         problem.setSolution(solution)
-
 
     problem.writeFile()
 

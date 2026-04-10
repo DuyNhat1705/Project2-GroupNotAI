@@ -5,19 +5,23 @@ import time
 logger = Logger(algo_name)
 logger.history["steps"] = []
 '''
-
+class SolverTimeoutError(Exception):
+    pass
 class Logger:
     def __init__(self):
         self.execution_time = 0.0 # in ms (miliseconds)
         self.memory_usage = 0.0 # in MB (MegaBytes)
-
+        self.start_time = 0.0
+        self.time_out = 0.0
         self.steps = []
         self._given_cells = set()
         self._n = 0
-    def reset(self, puzzle):
+    def reset(self, puzzle, time_out = 0.0):
         """Gọi trước mỗi lần solve để xóa state cũ."""
         self.steps = []
         self._n = puzzle.size
+        self.start_time = time.perf_counter()
+        self.time_out = time_out
         self.execution_time = 0.0
         self.memory_usage = 0.0
         self._given_cells = {
@@ -28,6 +32,9 @@ class Logger:
         }
     def log_step(self, i, j, v, tag = None, domains = None, facts_count = -0):
 
+        if self.time_out > 0:
+            if time.perf_counter() - self.start_time > self.time_out:
+                raise SolverTimeoutError(f"Exceeded time limit {self.time_out}s")
         if self._n == 0:
             return
         if tag is None:
@@ -57,8 +64,5 @@ class Logger:
                 v = grid[i - 1][j - 1]
                 domains[(i, j)] = frozenset({v}) if v != 0 else frozenset(range(1, n + 1))
         return domains
-        
-    def finish(self):
-        self.execution_time = (time.perf_counter() - self.start_time) * 1000
 
 step_logger = Logger()

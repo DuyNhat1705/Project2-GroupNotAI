@@ -115,22 +115,29 @@ def loadPageLayout():
     #     border-radius: 0px;
     #     z-index: -1;
     # }
-    
+    :root {
+    --cell-size: 52px;
+    --h-constraint-width: calc(var(--cell-size) / 2); /* Tỉ lệ 1/2 */
+    --v-constraint-height: calc(var(--cell-size) / 2.3); /* Tỉ lệ phù hợp */
+    }  
     /* ── Futoshiki Grid - Neon Purple & Magenta ── */
     .futoshiki-table { 
         table-layout: fixed;
         border-collapse: collapse; 
         margin: 0 auto;
-        width: auto;
+        width: max-content;
+        border-spacing: 0;
         font-family: 'JetBrains Mono', monospace;
     }
     
     .cell {
-        width: 52px; 
-        height: 52px; 
+        width: var(--cell-size); 
+        height: var(--cell-size);
+        aspect-ratio: 1 / 1; 
+                
         text-align: center; 
         vertical-align: middle;
-        font-size: 1.35rem; 
+        font-size: calc(var(--cell-size) * 0.4); 
         font-weight: 600;
         border: 3px solid #9d4edd;
         border-radius: 0px;
@@ -141,6 +148,7 @@ def loadPageLayout():
             0 0 8px rgba(157, 78, 221, 0.4),
             inset 0 0 10px rgba(157, 78, 221, 0.2);
         text-shadow: 0 0 5px #00f5ff;
+        transform-origin: top left;
     }
     
     .cell.given {
@@ -186,8 +194,9 @@ def loadPageLayout():
     }
     
     .constraint-h { 
-        width: 26px; 
-        height: 52px; 
+        width: var(--h-constraint-width);
+        height: var(--cell-size);
+        aspect-ratio: 1 / 2;
         text-align: center; 
         vertical-align: middle; 
         font-size: 1rem; 
@@ -197,8 +206,8 @@ def loadPageLayout():
     }
     
     .constraint-v { 
-        width: 52px; 
-        height: 22px; 
+        width: var(--cell-size); 
+        height: var(--v-constraint-height);
         text-align: center; 
         vertical-align: middle; 
         font-size: 1rem; 
@@ -207,7 +216,7 @@ def loadPageLayout():
         text-shadow: 0 0 5px #00f5ff;
     }
     
-    .constraint-gap { width: 26px; height: 22px; }
+    .constraint-gap { width: var(--h-constraint-width); height: var(--v-constraint-height); padding: 0; }
     
     /* ── Stat Badges - Neon Style ── */
     .stat-badge { 
@@ -284,18 +293,32 @@ def loadPageLayout():
         color: #00f5ff;
         border: 2px solid #ff006e;
         border-radius: 0px;
-        padding: 0.6rem 1.2rem;
-        font-size: 0.85rem;
+        
+        /* 1. QUAN TRỌNG: ÉP KÍCH THƯỚC */
+        width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        padding: 0.5rem 0.1rem !important; /* Giảm tối đa padding ngang */
+        
+        /* 2. CHỮ: THU NHỎ ĐỂ VỪA CỘT */
+        font-size: 0.7rem !important;      /* Giảm từ 0.85 xuống 0.7 */
         font-weight: 700;
-        width: 100%;
+        letter-spacing: 0px !important;    /* Bỏ giãn chữ để tiết kiệm diện tích */
+        white-space: nowrap !important;
+        
+        /* 3. CĂN CHỈNH TỰ ĐỘNG */
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        min-width: 0px !important;         /* KHÔNG để min-width cố định */
+        
+        /* 4. DECORATION */
+        font-family: 'JetBrains Mono', monospace;
         transition: all 0.2s;
-        box-shadow: 
-            0 0 12px rgba(255, 0, 110, 0.6),
-            inset 0 0 10px rgba(0, 245, 255, 0.1);
+        box-shadow: 0 0 10px rgba(255, 0, 110, 0.5);
         text-shadow: 0 0 5px rgba(0, 245, 255, 0.5);
         cursor: pointer;
-        font-family: 'JetBrains Mono', monospace;
-        letter-spacing: 1px;
+        
     }
     
     .stButton > button:hover {
@@ -304,7 +327,10 @@ def loadPageLayout():
             inset 0 0 15px rgba(0, 245, 255, 0.2);
         transform: translateY(-2px);
     }
-    
+    div[data-testid="column"] {
+        padding-left: 1px !important;  /* Giảm từ 3px xuống 1px */
+        padding-right: 1px !important;
+    }
     /* ── Sidebar ── */
     div[data-testid="stSidebar"] { 
         background: rgba(10, 14, 39, 0.95);
