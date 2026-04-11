@@ -97,7 +97,7 @@ class BackwardChaining(BaseAlgorithm):
                     self.kb.obs_facts.append(fact)
 
                     step_logger.log_step(row + 1, col + 1, val, tag='try',
-                                         domains=dict(domains),
+                                         domains=self._sync_GUI(problem, domains),
                                          facts_count=len(self.kb.obs_facts))
 
                     saved_domain = domains.pop((row, col))
@@ -112,7 +112,7 @@ class BackwardChaining(BaseAlgorithm):
                     self.kb.obs_facts.remove(fact)
 
                     step_logger.log_step(row + 1, col + 1, 0, tag='backtrack',
-                                         domains=dict(domains),
+                                         domains=self._sync_GUI(problem, domains),
                                          facts_count=len(self.kb.obs_facts))
 
                 # Put back numbers removed from neighbors' domains
@@ -292,28 +292,36 @@ class BackwardChaining(BaseAlgorithm):
                     # --- Horizontal Constraints ---
                     if fact.name == 'LessH':
                         if fact_r == row and fact_c == col:  # Current is Left
-                            if not prune_set(row, col + 1, lambda v_next: v_next > val): return False, pruned
+                            if not prune_set(row, col + 1, lambda v_next: v_next > val):
+                                return False, pruned
                         elif fact_r == row and fact_c == col - 1:  # Current is Right
-                            if not prune_set(row, col - 1, lambda v_prev: v_prev < val): return False, pruned
+                            if not prune_set(row, col - 1, lambda v_prev: v_prev < val):
+                                return False, pruned
 
                     elif fact.name == 'GreaterH':
                         if fact_r == row and fact_c == col:  # Current is Left
-                            if not prune_set(row, col + 1, lambda v_next: v_next < val): return False, pruned
+                            if not prune_set(row, col + 1, lambda v_next: v_next < val):
+                                return False, pruned
                         elif fact_r == row and fact_c == col - 1:  # Current is Right
-                            if not prune_set(row, col - 1, lambda v_prev: v_prev > val): return False, pruned
+                            if not prune_set(row, col - 1, lambda v_prev: v_prev > val):
+                                return False, pruned
 
                     # --- Vertical Constraints ---
                     elif fact.name == 'LessV':
                         if fact_r == row and fact_c == col:  # Current is Top
-                            if not prune_set(row + 1, col, lambda v_bot: v_bot > val): return False, pruned
+                            if not prune_set(row + 1, col, lambda v_bot: v_bot > val):
+                                return False, pruned
                         elif fact_r == row - 1 and fact_c == col:  # Current is Bottom
-                            if not prune_set(row - 1, col, lambda v_top: v_top < val): return False, pruned
+                            if not prune_set(row - 1, col, lambda v_top: v_top < val):
+                                return False, pruned
 
                     elif fact.name == 'GreaterV':
                         if fact_r == row and fact_c == col:  # Current is Top
-                            if not prune_set(row + 1, col, lambda v_bot: v_bot < val): return False, pruned
+                            if not prune_set(row + 1, col, lambda v_bot: v_bot < val):
+                                return False, pruned
                         elif fact_r == row - 1 and fact_c == col:  # Current is Bottom
-                            if not prune_set(row - 1, col, lambda v_top: v_top > val): return False, pruned
+                            if not prune_set(row - 1, col, lambda v_top: v_top > val):
+                                return False, pruned
 
         return True, pruned
 
@@ -349,21 +357,18 @@ class BackwardChaining(BaseAlgorithm):
                         if fact not in self.kb.obs_facts:
                             self.kb.obs_facts.append(fact)
 
-                        # Trigger your forward checker to prune the domains
-                        # (Uses whichever method name you currently have active)
+                        # Trigger forward checker to prune the domains
                         if hasattr(self, 'forward_check_kb'):
                             self.forward_check_kb(problem, self.domains, r, c, val)
-                        elif hasattr(self, 'forward_check'):
-                            self.forward_check(problem, self.domains, r, c, val)
 
             self.is_solved = False
 
         # Print tutorial and State Awareness
         print("\n" + "=" * 50)
-        print(" SWI-Prolog (Futoshiki Logic Engine)")
+        print("Futoshiki Query Engine")
         state_str = "SOLVED" if getattr(self, 'is_solved', False) else "UNSOLVED (Domains Loaded)"
         print(f" Current State: {state_str}")
-        print(" Variables must be Uppercase (e.g., X, Val).")
+        print(" Variables must be Uppercase")
         print(" Type 'exit' to quit.")
         print("=" * 50)
 
@@ -377,7 +382,7 @@ class BackwardChaining(BaseAlgorithm):
                 if user_input.endswith('.'):
                     user_input = user_input[:-1]
 
-                # --- FIX 2: Prevent crash on empty input ---
+                # Prevent crash on empty input
                 if not user_input:
                     continue
 
@@ -426,7 +431,7 @@ class BackwardChaining(BaseAlgorithm):
                     print("false.")
                     continue  # Skip the rest of the loop
 
-                # --- Post-Solve (or standard rule queries) ---
+                # --- Post-Solve ---
                 # Create query Atom and run full SLD Resolution
                 query = Atom(name, *parsed_args)
                 self.ask_prolog(query)
@@ -475,9 +480,30 @@ class BackwardChaining(BaseAlgorithm):
 
             binding_str = ", ".join(bindings)
 
-            # Only print if we haven't seen this exact answer yet
+            # Only print if not seen this exact answer yet
             if binding_str not in printed_bindings:
                 print(binding_str + " ;")
                 printed_bindings.add(binding_str)
 
         print("false.")
+
+    def _sync_GUI(self, problem, domains):
+        """
+        Combines the physical grid and the domain scratchpad
+        """
+        snap = {}
+        for r in range(problem.size):
+            for c in range(problem.size):
+
+                # Convert 0-idx (backend) to 1-idx (UI)
+                ui_r = r + 1
+                ui_c = c + 1
+
+                if problem.grid[r][c] != 0:
+                    # Cell is physically placed on the board
+                    snap[(ui_r, ui_c)] = {int(problem.grid[r][c])}
+                elif (r, c) in domains:
+                    # Cell is empty, grab available options
+                    snap[(ui_r, ui_c)] = set(domains[(r, c)])
+
+        return snap
