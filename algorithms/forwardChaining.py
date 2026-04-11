@@ -21,9 +21,7 @@ class ForwardChaining(BaseAlgorithm):
             if hasattr(fact, 'name') and fact.name == 'Given':
                 i, j, v = fact.args[0].value, fact.args[1].value, fact.args[2].value
                 self._add_val(kb, i, j, v)
-                step_logger.log_step(i, j, v, tag='given',
-                                     domains=dict(kb.domains),
-                                     facts_count=len(kb.obs_facts))
+                step_logger.log_step(i, j, v, tag='given',domains=dict(kb.domains),facts_count=len(kb.obs_facts))
 
         result_kb = self._backtrack(kb)
         step_logger.execution_time = (time.perf_counter() - start_time) * 1000
@@ -111,9 +109,7 @@ class ForwardChaining(BaseAlgorithm):
                         if Atom('Val', i, j, v) not in kb.obs_facts:
                             self._add_val(kb, i, j, v)
                             changed = True
-                            step_logger.log_step(i, j, v, tag='deduced',
-                                                 domains=dict(kb.domains),
-                                                 facts_count=len(kb.obs_facts))
+                            step_logger.log_step(i, j, v, tag='deduced',domains=dict(kb.domains),facts_count=len(kb.obs_facts))
 
             # Rebuild val_set after A1 before checking ground rules
             val_set = {f for f in kb.obs_facts if hasattr(f, 'name') and f.name == 'Val'}
@@ -189,16 +185,12 @@ class ForwardChaining(BaseAlgorithm):
         for v in sorted(kb.domains[(i, j)]):
             kb_copy = self._clone(kb)
             self._add_val(kb_copy, i, j, v)
-            step_logger.log_step(i, j, v, tag='try',
-                                 domains=dict(kb_copy.domains),
-                                 facts_count=len(kb_copy.obs_facts))
+            step_logger.log_step(i, j, v, tag='try',domains=dict(kb_copy.domains),facts_count=len(kb_copy.obs_facts))
 
             result = self._backtrack(kb_copy)
             if result is not None:
                 return result
 
-            step_logger.log_step(i, j, 0, tag='backtrack',
-                                 domains=dict(kb.domains),
-                                 facts_count=len(kb.obs_facts))
+            step_logger.log_step(i, j, 0, tag='backtrack',domains=dict(kb.domains),facts_count=len(kb.obs_facts))
 
         return None
