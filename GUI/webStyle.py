@@ -1,5 +1,5 @@
 import streamlit as st
-def loadPageLayout():
+def loadPageStyle():
     # ─── Page Config ──────────────────────────────────────────────────────────────
     st.set_page_config(page_title="Futoshiki Solver", page_icon="🧩", layout="wide")
     
@@ -557,3 +557,6 @@ def loadPageFooter():
         'FUTOSHIKI SOLVER · PROJECT 2 · GROUP NOTAI</p>',
         unsafe_allow_html=True,
     )
+def loadPageHeader():
+    st.markdown('<div class="hero-title">🧩 FUTOSHIKI SOLVER</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-sub">AI Puzzle Solver · Step-by-step Animation · KB Trace Log</div>', unsafe_allow_html=True)

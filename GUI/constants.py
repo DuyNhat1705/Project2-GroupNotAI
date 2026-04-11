@@ -1,3 +1,4 @@
+import os
 ALGO_MAP = {
     "Forward Chaining": "fc",
     "Backward Chaining": "bc",
@@ -14,3 +15,4 @@ STEP_DELAY_OPTIONS = {
     "Very Fast (0.05s)": 0.05
 }
 TIME_OUT = 15.0 # seconds
+INPUTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'Inputs')
