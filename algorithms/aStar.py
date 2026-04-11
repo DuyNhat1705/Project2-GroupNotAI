@@ -125,205 +125,162 @@ class AStar(BaseAlgorithm):
         # Return the constaints grid and the most constraint cell position
         return i, j, c_grid
 
-    def deep_propagate(self, problem, temp_grid, temp_c_grid, start_row, start_col, start_value):
+    def propagate(self, problem, temp_grid, temp_c_grid, row, col, value):
         """
-        Prunes search branches that violate First-Order Logic (FOL) constraints.
+        Lightweight domain refinement after assigning a value to (row, col).
 
-        This method performs constraint propagation starting from a specific cell 
-        assignment to eliminate invalid states in the search space.
+        Updates the constraint sets of all peers in the same row/column and
+        of the four direct inequality neighbours. Does NOT force-assign any
+        cell (no AC-3 queue).
 
         Args:
-            problem (tuple): The original horizontal and vertical constraint grids.
-            temp_grid (list[list]): Current grid state after the new value assignment.
-            temp_c_grid (list[list]): Current constraint grid state after the assignment.
-            start_row (int): Row index of the cell where propagation begins.
-            start_col (int): Column index of the cell where propagation begins.
-            start_value (int/str): The value assigned to the starting cell.
+            problem: The problem object carrying HorizontalConstraints and
+                     VerticalConstraints.
+            temp_grid (list[list]): Grid state with the new value already placed.
+            temp_c_grid (list[list]): Constraint (excluded-values) sets to update.
+            row (int): Row of the just-assigned cell.
+            col (int): Column of the just-assigned cell.
+            value (int): Value that was assigned.
 
         Returns:
-            tuple/bool: The updated (grid, constraint_grid) or False if a violation is detected.
+            bool: False if any unassigned cell's domain becomes empty (dead end),
+                  True otherwise.
         """
 
         n = len(temp_grid)
 
-        queue = [(start_row, start_col, start_value)]
-        ac3_score = 0
-        dead_end = False
-        
-        while queue:
-            r, c, v = queue.pop(0)
+        # --- Row & column peers: remove `value` from their available domain ---
+        for i in range(n):
+            if i != row and temp_grid[i][col] == 0:
+                temp_c_grid[i][col].add(value)
+                if len(temp_c_grid[i][col]) == n:   # domain is now empty
+                    return False
 
-            for i in range(n):
-                # Skip the current cell itself
-                if i != r and temp_grid[i][c] == 0:
-                    if v not in temp_c_grid[i][c]:
-                        temp_c_grid[i][c].add(v)
+            if i != col and temp_grid[row][i] == 0:
+                temp_c_grid[row][i].add(value)
+                if len(temp_c_grid[row][i]) == n:
+                    return False
 
-                    constraints = len(temp_c_grid[i][c])
+        # --- Inequality neighbours ---
 
-                    # If there is only 1 value avalible in the cell, assign the value to it
-                    if constraints == n - 1:
-                        force_move = self.getValidMoves(i, c, temp_c_grid)[0]
-                        queue.append((i, c, force_move))
-                        temp_grid[i][c] = force_move
-                        ac3_score += 1
+        # Left cell  (HorizontalConstraints[row][col-1] describes left OP current)
+        if col > 0 and temp_grid[row][col - 1] == 0:
+            relation = problem.HorizontalConstraints[row][col - 1]
 
-                # Skip the current cell itself
-                if i != c and temp_grid[r][i] == 0:
-                    if v not in temp_c_grid[r][i]:
-                        temp_c_grid[r][i].add(v)
+            if relation == 1:       # left < value  →  left cannot be >= value
+                for val in range(value, n + 1):
+                    temp_c_grid[row][col - 1].add(val)
+            elif relation == -1:    # left > value  →  left cannot be <= value
+                for val in range(1, value + 1):
+                    temp_c_grid[row][col - 1].add(val)
 
-                    constraints = len(temp_c_grid[r][i])
+            if len(temp_c_grid[row][col - 1]) == n:
+                return False
 
-                    # If there is only 1 value avalible in the cell, assign the value to it
-                    if constraints == n - 1:
-                        force_move = self.getValidMoves(r, i, temp_c_grid)[0]
-                        queue.append((r, i, force_move))
-                        temp_grid[r][i] = force_move
-                        ac3_score += 1
+        # Right cell  (HorizontalConstraints[row][col] describes current OP right)
+        if col < n - 1 and temp_grid[row][col + 1] == 0:
+            relation = problem.HorizontalConstraints[row][col]
 
-            # Checking all four directions for constraint
-            # Horizontal
-            # Left cell
-            if c > 0 and temp_grid[r][c - 1] == 0:
-                relation = problem.HorizontalConstraints[r][c - 1]
+            if relation == 1:       # value < right  →  right cannot be <= value
+                for val in range(1, value + 1):
+                    temp_c_grid[row][col + 1].add(val)
+            elif relation == -1:    # value > right  →  right cannot be >= value
+                for val in range(value, n + 1):
+                    temp_c_grid[row][col + 1].add(val)
 
-                if relation == 1: # Left < Current
-                    for val in range(v, n + 1): 
-                        temp_c_grid[r][c - 1].add(val)
-                elif relation == -1: # Left > Current   
-                    for val in range(1, v + 1): 
-                        temp_c_grid[r][c - 1].add(val)
+            if len(temp_c_grid[row][col + 1]) == n:
+                return False
 
-                constraints = len(temp_c_grid[r][c - 1])
+        # Up cell  (VerticalConstraints[row-1][col] describes up OP current)
+        if row > 0 and hasattr(problem, 'VerticalConstraints') and temp_grid[row - 1][col] == 0:
+            relation = problem.VerticalConstraints[row - 1][col]
 
-                # If there is only 1 value avalible in the cell, assign the value to it
-                if constraints == n - 1:
-                    force_move = self.getValidMoves(r, c - 1, temp_c_grid)[0]
-                    queue.append((r, c - 1, force_move))
-                    temp_grid[r][c - 1] = force_move
-                    ac3_score += 1
+            if relation == 1:       # up < value  →  up cannot be >= value
+                for val in range(value, n + 1):
+                    temp_c_grid[row - 1][col].add(val)
+            elif relation == -1:    # up > value  →  up cannot be <= value
+                for val in range(1, value + 1):
+                    temp_c_grid[row - 1][col].add(val)
 
-            # Right cell
-            if c < n - 1 and temp_grid[r][c + 1] == 0:
-                relation = problem.HorizontalConstraints[r][c]
+            if len(temp_c_grid[row - 1][col]) == n:
+                return False
 
-                if relation == 1: # Current < Right
-                    for val in range(1, v + 1): 
-                        temp_c_grid[r][c + 1].add(val)
-                elif relation == -1: # Current > Right   
-                    for val in range(v, n + 1): 
-                        temp_c_grid[r][c + 1].add(val)
+        # Down cell  (VerticalConstraints[row][col] describes current OP down)
+        if row < n - 1 and hasattr(problem, 'VerticalConstraints') and temp_grid[row + 1][col] == 0:
+            relation = problem.VerticalConstraints[row][col]
 
-                constraints = len(temp_c_grid[r][c + 1])
-
-                # If there is only 1 value available in the cell, assign the value to it
-                if constraints == n - 1:
-                    force_move = self.getValidMoves(r, c + 1, temp_c_grid)[0]
-                    queue.append((r, c + 1, force_move))
-                    temp_grid[r][c + 1] = force_move
-                    ac3_score += 1
-
-            # Vertical
-            # Up cell
-            if r > 0 and hasattr(problem, 'VerticalConstraints') and temp_grid[r - 1][c] == 0:
-                relation = problem.VerticalConstraints[r - 1][c]
-
-                if relation == 1: # Up < Current
-                    for val in range(v, n + 1): 
-                        temp_c_grid[r - 1][c].add(val)
-                elif relation == -1: # Up > Current   
-                    for val in range(1, v + 1): 
-                        temp_c_grid[r - 1][c].add(val)
-
-                constraints = len(temp_c_grid[r - 1][c])
-
-                # If there is only 1 value available in the cell, assign the value to it
-                if constraints == n - 1:
-                    force_move = self.getValidMoves(r - 1, c, temp_c_grid)[0]
-                    queue.append((r - 1, c, force_move))
-                    temp_grid[r - 1][c] = force_move
-                    ac3_score += 1
-
-            # Down cell
-            if r < n - 1 and hasattr(problem, 'VerticalConstraints') and temp_grid[r + 1][c] == 0:
-                relation = problem.VerticalConstraints[r][c]
-
-                if relation == 1: # Current < Down
-                    for val in range(1, v + 1): 
-                        temp_c_grid[r + 1][c].add(val)
-                elif relation == -1: # Current > Down   
-                    for val in range(v, n + 1): 
-                        temp_c_grid[r + 1][c].add(val)
-
-                constraints = len(temp_c_grid[r + 1][c])
-
-                # If there is only 1 value available in the cell, assign the value to it
-                if constraints == n - 1:
-                    force_move = self.getValidMoves(r + 1, c, temp_c_grid)[0]
-                    queue.append((r + 1, c, force_move))
-                    temp_grid[r + 1][c] = force_move
-                    ac3_score += 1
-        
-        empty_domain_count = 0
-        for r in range(n):
-            for c in range(n):
-                if temp_grid[r][c] == 0 and len(temp_c_grid[r][c]) == n:
-                    empty_domain_count += 1
+            if relation == 1:       # value < down  →  down cannot be <= value
+                for val in range(1, value + 1):
+                    temp_c_grid[row + 1][col].add(val)
+            elif relation == -1:    # value > down  →  down cannot be >= value
+                for val in range(value, n + 1):
+                    temp_c_grid[row + 1][col].add(val)
                     
-        return ac3_score, empty_domain_count
+            if len(temp_c_grid[row + 1][col]) == n:
+                return False
 
-    def heuristic(self, problem, problem_grid, constraint_grid, row, col, value, current_remaining, option = 3):
+        return True
+
+    def heuristic(self, problem, problem_grid, constraint_grid, row, col, value, current_remaining, option = 2):
         """
         Calculates the heuristic value for a specific grid configuration.
 
+        After assigning `value` to (row, col), lightweight domain propagation is
+        performed via `propagate`. If any unassigned cell ends up with an empty
+        domain the assignment is a dead end and float("inf") is returned so the
+        caller can prune it immediately.
+
+        Supported options:
+            1 — number of remaining unassigned cells (Remaining Cells).
+            2 — number of unsatisfied inequality constraints (Degree-style).
+
         Args:
-            problem (tuple): The original constraint grids (Horizontal, Vertical).
-            problem_grid (list[list]): The current state/values of the grid.
-            constraint_grid (list[list]): The current state of the constraints applied.
-            row (int): Row index of the cell being evaluated.
-            col (int): Column index of the cell being evaluated.
-            value (int): The value assigned to the cell to trigger evaluation.
-            current_remaining (int): Number of remaining unassigned cells or possible values.
-            option (str/int): The specific heuristic method to be used (e.g., 'MRV', 'Degree').
+            problem: The problem object carrying HorizontalConstraints /
+                     VerticalConstraints.
+            problem_grid (list[list]): Current grid state (values).
+            constraint_grid (list[list]): Current excluded-value sets.
+            row (int): Row of the cell being assigned.
+            col (int): Column of the cell being assigned.
+            value (int): Value being tried.
+            current_remaining (int): Number of currently unassigned cells.
+            option (int): Heuristic variant — 1 or 2.
 
         Returns:
-            float/int: The calculated heuristic score for the given state
+            tuple: (row, col, value, h_value, temp_grid, temp_c_grid, remaining_cells)
+                   h_value is float("inf") when the assignment leads to a dead end.
         """
 
-        rows = len(problem_grid)       
-        cols = len(problem_grid[0])    
-        
+        rows = len(problem_grid)
+        cols = len(problem_grid[0])
+
         temp_grid = [r[:] for r in problem_grid]
         temp_c_grid = [[set(s) for s in r] for r in constraint_grid]
 
-        # Assign the value to cell
+        # Assign the value to the cell
         temp_grid[row][col] = value
 
-        ac3_score, empty_domain_count = self.deep_propagate(problem, temp_grid, temp_c_grid, row, col, value) 
+        remaining_cells = current_remaining - 1
 
-        remaining_cells = current_remaining - 1 - ac3_score
+        # Purning branches that violates FOL without using AC-3
+        if not self.propagate(problem, temp_grid, temp_c_grid, row, col, value):
+            return row, col, value, float("inf"), temp_grid, temp_c_grid, remaining_cells
 
         if option == 1:
             h_value = remaining_cells
-            
-        elif option == 2:
+
+        else:
             additional_steps = 0
             for r in range(rows):
                 for c in range(cols):
-                    if c < cols - 1 and problem.HorizontalConstraints[r][c] != 0: 
-                        if temp_grid[r][c] == 0 or temp_grid[r][c+1] == 0:
+                    if c < cols - 1 and problem.HorizontalConstraints[r][c] != 0:
+                        if temp_grid[r][c] == 0 or temp_grid[r][c + 1] == 0:
                             additional_steps += 1
-                    if r < rows - 1 and hasattr(problem, 'VerticalConstraints') and problem.VerticalConstraints[r][c] != 0: 
-                        if temp_grid[r][c] == 0 or temp_grid[r+1][c] == 0:
+                    if r < rows - 1 and hasattr(problem, 'VerticalConstraints') and problem.VerticalConstraints[r][c] != 0:
+                        if temp_grid[r][c] == 0 or temp_grid[r + 1][c] == 0:
                             additional_steps += 1
-
             h_value = additional_steps
 
-        elif option == 3:
-            h_value = empty_domain_count
-
-        return row, col, value, h_value, temp_grid, temp_c_grid, remaining_cells        
+        return row, col, value, h_value, temp_grid, temp_c_grid, remaining_cells
 
     def getValidMoves(self, row, col, c_grid):
         """Get all the valid moves from constraints grid"""
@@ -337,14 +294,15 @@ class AStar(BaseAlgorithm):
 
         return valid
 
-    def solve(self, problem, option = 3):
+    def solve(self, problem, option = 2):
 
         if option == 1:
             print("Running A* algorithm on Heuristic 1...")
         elif option == 2:
             print("Running A* algorithm on Heuristic 2...")
         else:
-            print("Running A* algorithm on Heuristic 3...")
+            print("Invalid heuristic option. Defaulting to Heuristic 2.")
+            option = 2
 
         start_time = time.perf_counter()
 
