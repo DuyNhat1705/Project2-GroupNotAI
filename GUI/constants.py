@@ -32,4 +32,13 @@ TAG_STYLE_MAP = {
     'deduced': ('DEDUCED', '#00ff88', 'rgba(0, 255, 136, 0.15)'),
     'backtrack': ('BACKTRACK', '#ffdd00', 'rgba(255, 221, 0, 0.15)'),
 }
+COLOR_MAP = {
+    "Backward Chaining": "#7b2ff7", 
+    "Forward Chaining": "#00d4ff",  
+    "SAT": "#ff006e",               
+    "A* H1": "#fee440",
+    "A* H2": "#ff9100",  
+    "Backtracking": "#06d6a0",      
+    "Brute Force": "#8d99ae"
+}
 INPUTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'Inputs')

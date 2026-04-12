@@ -1,6 +1,5 @@
-import time
+import os
 import copy
-import json
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -17,7 +16,8 @@ from algorithms.bruteForce import BruteForce
 from utils.logger import step_logger
 
 TIMEOUT = 300  # 5 minutes
-
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+OUTPUT_DIR = os.path.join(CURRENT_DIR, 'Outputs')
 
 def run_solver_worker(solver_class, problem, queue, astar_option=None):
     """
@@ -100,8 +100,9 @@ def benchmark_puzzle(solvers, puzzle_file, puzzle_name):
 
 def export_json(df, output_filename="raw_result.json"):
     """Exports the benchmark dataframe to a JSON file."""
-    print(f"Exporting raw data to JSON: {output_filename}")
-    df.to_json(output_filename, orient='records', indent=4)
+    full_path = os.path.join(OUTPUT_DIR, output_filename)
+    print(f"Exporting raw data to JSON: {full_path}")
+    df.to_json(full_path, orient='records', indent=4)
 
 
 def _gen_charts(df):
@@ -132,9 +133,10 @@ def _gen_charts(df):
     ax1.set_yscale('log')
     ax1.legend(title='Solver', bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0)
     plt.tight_layout()
-    fig1.savefig("Benchmark_Time.pdf", dpi=300)
+    time_benchmark_path = os.path.join(OUTPUT_DIR, "Benchmark_Time.pdf")
+    fig1.savefig(time_benchmark_path, dpi=300)
     plt.close(fig1)
-    print(" -> Saved Benchmark_Time.pdf")
+    print(f" -> Saved at {time_benchmark_path}")
 
     # --- Bảng 2: Complexity (Total Steps) ---
     fig2, ax2 = plt.subplots(figsize=(12, 6))
@@ -145,13 +147,15 @@ def _gen_charts(df):
     ax2.set_yscale('log')
     ax2.legend(title='Solver', bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0)
     plt.tight_layout()
-    fig2.savefig("Benchmark_Space.pdf", dpi=300)
+    space_benchmark_path = os.path.join(OUTPUT_DIR, "Benchmark_Space.pdf")
+    fig2.savefig(space_benchmark_path, dpi=300)
     plt.close(fig2)
-    print(" -> Saved Benchmark_Space.pdf")
+    print(f" -> Saved at {space_benchmark_path}")
 
 
 if __name__ == '__main__':
-    # Đã comment/xóa dòng của A* H3
+
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
     solvers = {
         'Backward Chaining':  {'class': BackwardChaining},
         'Forward Chaining':   {'class': ForwardChaining},

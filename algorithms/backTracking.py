@@ -43,7 +43,7 @@ class Backtracking(BaseAlgorithm):
                     solution[i][j] = num
                     self.row_mask[i] |= (1 << num)
                     self.col_mask[j] |= (1 << num)
-                    step_logger.log_step(i, j, num, tag = "deduced",domains = step_logger.grid_to_domains(solution))
+                    step_logger.log_step(i, j, num, tag = "try",domains = step_logger.grid_to_domains(solution))
                     if (i == n - 1) and (j == n - 1):
                         return True
                     if self.recursion(solution, problem, indexRow, indexCol, n):
@@ -59,8 +59,6 @@ class Backtracking(BaseAlgorithm):
             return self.recursion(solution, problem, indexRow, indexCol, n)
         
     def solve(self, problem):
-        if hasattr(step_logger, 'reset'):
-                    step_logger.reset(problem)
 
         n = problem.size
         solution = problem.grid
@@ -73,10 +71,6 @@ class Backtracking(BaseAlgorithm):
                     num = solution[i][j]
                     self.row_mask[i] |= (1 << num)
                     self.col_mask[j] |= (1 << num)
-                    
-                    domains = step_logger.grid_to_domains(solution) if hasattr(step_logger, 'grid_to_domains') else None
-                    step_logger.log_step(i, j, num, tag = "given", domains = domains)
-
         start_time = time.perf_counter()
         self.recursion(solution, problem, 0, 0, n)
         end_time = time.perf_counter()

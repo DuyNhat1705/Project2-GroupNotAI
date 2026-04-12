@@ -46,7 +46,6 @@ def render_visual_nav():
             "Heuristic", options=list(constants.HEURISTIC_MAP.keys()), label_visibility="collapsed",
         )
         selected_heuristic = constants.HEURISTIC_MAP[selected_heuristic_name]
-        print(selected_heuristic)
     st.markdown("---")
     solve_btn = st.button("▶ SOLVE & CAPTURE STEPS", use_container_width=True)
 

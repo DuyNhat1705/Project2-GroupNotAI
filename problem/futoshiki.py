@@ -3,6 +3,8 @@ import os
 class Futoshiki():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(base_dir)
+    output_dir = os.path.join(project_root, 'Outputs')
+    os.makedirs(output_dir, exist_ok=True)
     def __init__(self, file):
         self.size = 0
         self.grid = []
@@ -11,7 +13,7 @@ class Futoshiki():
         self.VerticalConstraints = []
         self.problemNumber = file[6:]
         self.input_path = os.path.join(self.project_root, 'Inputs', f'{file}.txt')
-        self.output_path = os.path.join(self.project_root, 'Outputs', f'output-{self.problemNumber}.txt')
+        self.output_path = os.path.join(self.output_dir, f'output-{self.problemNumber}.txt')
         self.loadFromFile(self.input_path)
         
     def loadFromFile(self, file):

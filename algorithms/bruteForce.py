@@ -52,7 +52,7 @@ class BruteForce(BaseAlgorithm):
         if solution[i][j] == 0:
             for num in range(1, n + 1):
                 solution[i][j] = num
-                step_logger.log_step(i, j, num, tag = "deduced", domains = step_logger.grid_to_domains(solution))
+                step_logger.log_step(i, j, num, tag = "try", domains = step_logger.grid_to_domains(solution))
                 if (i == n - 1) and (j == n - 1):
                     return self.isValid(solution, problem, n)
                 if self.recursion(solution, problem, indexRow, indexCol, n):
@@ -66,18 +66,6 @@ class BruteForce(BaseAlgorithm):
             return self.recursion(solution, problem, indexRow, indexCol, n)
         
     def solve(self, problem):
-        # if hasattr(step_logger, 'reset'):
-        #     step_logger.reset(problem)
-            
-        n = problem.size
-        solution = problem.grid
-
-        # for r in range(n):
-        #     for c in range(n):
-        #         if solution[r][c] != 0:
-        #             domains = step_logger.grid_to_domains(solution) if hasattr(step_logger, 'grid_to_domains') else None
-        #             step_logger.log_step(r, c, solution[r][c], tag="given", domains=domains)
-
         n = problem.size
         solution = problem.grid
         start_time = time.perf_counter()
