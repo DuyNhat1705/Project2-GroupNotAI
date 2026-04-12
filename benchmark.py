@@ -110,15 +110,14 @@ def _gen_charts(df):
 
     sns.set_theme(style="whitegrid")
 
-    # Distinct, high-contrast palette — one color per solver (Giữ lại màu gốc)
+    # Đã xóa màu của A* H3 để khớp với số lượng solver
     solver_names = df['Solver'].unique().tolist()
     distinct_colors = [
-        '#E63946',  # red         — Backward Chaining
+        '#E63946',  # red        — Backward Chaining
         '#F4A261',  # orange      — Forward Chaining
         '#2A9D8F',  # teal        — SAT
         '#457B9D',  # steel blue  — A* H1
         '#1D3557',  # dark navy   — A* H2
-        '#A8DADC',  # light cyan  — A* H3
         '#6A0572',  # purple      — Backtracking
         '#8B8000',  # dark yellow — Brute Force
     ]
@@ -152,26 +151,29 @@ def _gen_charts(df):
 
 
 if __name__ == '__main__':
-    # Define the solvers to test
-    # Each entry: {'class': <SolverClass>, 'option': <optional heuristic>}
+    # Đã comment/xóa dòng của A* H3
     solvers = {
         'Backward Chaining':  {'class': BackwardChaining},
         'Forward Chaining':   {'class': ForwardChaining},
         'SAT':                {'class': SATSolver},
         'A* H1':              {'class': AStar, 'option': 1},
         'A* H2':              {'class': AStar, 'option': 2},
-        'A* H3':              {'class': AStar, 'option': 3},
         'Backtracking':       {'class': Backtracking},
         'Brute Force':        {'class': BruteForce},
     }
 
     # Puzzle sizes to test
     puzzles = {
-        '4x4': 'input-02',
-        '5x5': 'input-04',
-        '6x6': 'input-06',
-        '7x7': 'input-08',
-        '9x9': 'input-09',
+        '4x4_1': 'input-01',  # Rất dễ
+        '4x4_2': 'input-02',  # Dễ
+        '5x5_1': 'input-03',  # Trung bình
+        '5x5_2': 'input-04',  # Trung bình - Khó
+        '6x6_1': 'input-05',  # Khó
+        '6x6_2': 'input-06',  # Khó - Ít gợi ý
+        '7x7_1': 'input-07',  # Rất khó
+        '7x7_2': 'input-08',  # Chuyên gia
+        '8x8': 'input-09',    # Cực khó
+        '9x9': 'input-10',    # Bậc thầy
     }
 
     all_results = []
