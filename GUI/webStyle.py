@@ -1,6 +1,6 @@
 import streamlit as st
 import streamlit.components.v1 as components
-def loadPageLayout():
+def loadPageStyle():
     st.set_page_config(page_title="Futoshiki Solver", page_icon="🧩", layout="wide")
     
     st.markdown("""
@@ -558,6 +558,9 @@ def loadPageFooter():
         '<p style="text-align:center;color:#0a0e27;font-size:0.7rem;">FUTOSHIKI SOLVER</p>',
         unsafe_allow_html=True,
     )
+def loadPageHeader():
+    st.markdown('<div class="hero-title">🧩 FUTOSHIKI SOLVER</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-sub">FUTOSHIKI SOLVER · GROUP 03 · GROUP NON-AI</div>', unsafe_allow_html=True)
 
 def render_badge(text, badge_class):
     """Helper to render a stat badge."""

@@ -1,3 +1,4 @@
+import os
 ALGO_MAP = {
     "Forward Chaining": "fc",
     "Backward Chaining": "bc",
@@ -9,8 +10,7 @@ ALGO_MAP = {
 
 HEURISTIC_MAP = {
     "Heuristic 1 - Unassigned Cells": 1,
-    "Heuristic 2 - Inequality Chains": 2,
-    "Heuristic 3 - Arc-Consistency": 3,
+    "Heuristic 2 - Inequality Chains": 2
 }
 
 STEP_DELAY_OPTIONS = {
@@ -32,3 +32,4 @@ TAG_STYLE_MAP = {
     'deduced': ('DEDUCED', '#00ff88', 'rgba(0, 255, 136, 0.15)'),
     'backtrack': ('BACKTRACK', '#ffdd00', 'rgba(255, 221, 0, 0.15)'),
 }
+INPUTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'Inputs')
