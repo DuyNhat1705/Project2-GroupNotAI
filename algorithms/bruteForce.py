@@ -2,13 +2,16 @@ from algorithms.base_algorithm import BaseAlgorithm
 from utils.logger import step_logger
 import time
 import sys
+
 class BruteForce(BaseAlgorithm):
     def __init__(self, params = None):
         super().__init__("Brute Force", params)
+
     def isValid(self, solution, problem, n):
         # Same num check
         row_masks = [0] * n
         col_masks = [0] * n
+        
         for i in range(n):
             for j in range(n):
                 num = solution[i][j]
@@ -16,6 +19,7 @@ class BruteForce(BaseAlgorithm):
                     return False
                 row_masks[i] |= (1 << num)
                 col_masks[j] |= (1 << num)
+
         # Constraint Check
         for i in range(n):
             for j in range(n):
@@ -60,6 +64,7 @@ class BruteForce(BaseAlgorithm):
             if (i == n - 1) and (j == n - 1):
                 return self.isValid(solution, problem, n)
             return self.recursion(solution, problem, indexRow, indexCol, n)
+        
     def solve(self, problem):
         n = problem.size
         solution = problem.grid

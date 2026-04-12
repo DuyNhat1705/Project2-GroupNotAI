@@ -1,5 +1,6 @@
 streamlit
 python-sat
 pandas
+plotly
 seaborn
 matplotlib

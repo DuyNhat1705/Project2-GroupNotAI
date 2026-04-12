@@ -1,20 +1,22 @@
 import streamlit as st
+import streamlit.components.v1 as components
 def loadPageStyle():
-    # ─── Page Config ──────────────────────────────────────────────────────────────
     st.set_page_config(page_title="Futoshiki Solver", page_icon="🧩", layout="wide")
     
-    # ─── CSS - Retro Neon Pixel Art Aesthetic ──────────────────────────────────────
     st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;600&display=swap');
     
     * { box-sizing: border-box; }
-    
+                
+    div[data-testid="stToolbarActions"],
+    div[data-testid="stDecoration"],
+    #MainMenu { display: none !important; }
+
     html, body, [class*="css"] { 
         font-family: 'JetBrains Mono', monospace;
     }
                 
-    /* Ẩn widget trạng thái đang chạy của Streamlit */
     div[data-testid="stStatusWidget"] {
         visibility: hidden;
         display: none;
@@ -91,49 +93,29 @@ def loadPageStyle():
         letter-spacing: 2px;
     }
     
-    /* Glass Card - Neon Purple Border */
-    # .glass-card {
-    #     background: rgba(10, 14, 39, 0.8);
-    #     border: 2px solid #9d4edd;
-    #     border-radius: 0px;
-    #     padding: 1.2rem;
-    #     margin-bottom: 1rem;
-    #     box-shadow: 
-    #         0 0 10px rgba(157, 78, 221, 0.3),
-    #         inset 0 0 20px rgba(157, 78, 221, 0.1);
-    #     position: relative;
-    # }
-    
-    # .glass-card::before { 
-    #     content: '';
-    #     position: absolute;
-    #     top: -2px;
-    #     left: -2px;
-    #     right: -2px;
-    #     bottom: -2px;
-    #     background: linear-gradient(45deg, transparent, rgba(0, 245, 255, 0.1), transparent);
-    #     border-radius: 0px;
-    #     z-index: -1;
-    # }
     :root {
     --cell-size: 52px;
-    --h-constraint-width: calc(var(--cell-size) / 2); /* Tỉ lệ 1/2 */
-    --v-constraint-height: calc(var(--cell-size) / 2.3); /* Tỉ lệ phù hợp */
+    --h-constraint-width: calc(var(--cell-size) / 2);
+    --v-constraint-height: calc(var(--cell-size) / 2.3);
     }  
     /* ── Futoshiki Grid - Neon Purple & Magenta ── */
     .futoshiki-table { 
         table-layout: fixed;
-        border-collapse: collapse; 
+        border-collapse: separate; 
+        border-spacing: 4px;
         margin: 0 auto;
         width: max-content;
-        border-spacing: 0;
         font-family: 'JetBrains Mono', monospace;
+        overflow: visible;
     }
     
     .cell {
         width: var(--cell-size); 
         height: var(--cell-size);
-        aspect-ratio: 1 / 1; 
+        aspect-ratio: 1 / 1;
+        box-sizing: border-box;
+        display: table-cell;
+        background-clip: padding-box;
                 
         text-align: center; 
         vertical-align: middle;
@@ -152,9 +134,9 @@ def loadPageStyle():
     }
     
     .cell.given {
+        border: 3px solid #c77dff;
         background: rgba(157, 78, 221, 0.3);
         color: #c77dff;
-        border-color: #c77dff;
         box-shadow: 
             0 0 12px rgba(199, 125, 255, 0.5),
             inset 0 0 10px rgba(199, 125, 255, 0.2);
@@ -162,9 +144,9 @@ def loadPageStyle():
     }
     
     .cell.solved {
+        border: 3px solid #00ffff;
         background: rgba(0, 245, 255, 0.15);
         color: #00ffff;
-        border-color: #00ffff;
         box-shadow: 
             0 0 15px rgba(0, 255, 255, 0.6),
             inset 0 0 10px rgba(0, 255, 255, 0.2);
@@ -173,9 +155,9 @@ def loadPageStyle():
     }
     
     .cell.active {
+        border: 3px solid #ff006e;
         background: rgba(255, 0, 110, 0.25);
         color: #ff006e;
-        border-color: #ff006e;
         box-shadow: 
             0 0 20px rgba(255, 0, 110, 0.8),
             inset 0 0 10px rgba(255, 0, 110, 0.3);
@@ -197,6 +179,9 @@ def loadPageStyle():
         width: var(--h-constraint-width);
         height: var(--cell-size);
         aspect-ratio: 1 / 2;
+        box-sizing: border-box;
+        display: table-cell;
+        border: none;
         text-align: center; 
         vertical-align: middle; 
         font-size: 1rem; 
@@ -208,6 +193,9 @@ def loadPageStyle():
     .constraint-v { 
         width: var(--cell-size); 
         height: var(--v-constraint-height);
+        box-sizing: border-box;
+        display: table-cell;
+        border: none;
         text-align: center; 
         vertical-align: middle; 
         font-size: 1rem; 
@@ -294,25 +282,20 @@ def loadPageStyle():
         border: 2px solid #ff006e;
         border-radius: 0px;
         
-        /* 1. QUAN TRỌNG: ÉP KÍCH THƯỚC */
         width: 100% !important;
         box-sizing: border-box !important;
         margin: 0 !important;
-        padding: 0.5rem 0.1rem !important; /* Giảm tối đa padding ngang */
+        padding: 0.5rem 0.1rem !important;
         
-        /* 2. CHỮ: THU NHỎ ĐỂ VỪA CỘT */
-        font-size: 0.7rem !important;      /* Giảm từ 0.85 xuống 0.7 */
+        font-size: 0.7rem !important;
         font-weight: 700;
-        letter-spacing: 0px !important;    /* Bỏ giãn chữ để tiết kiệm diện tích */
+        letter-spacing: 0px !important;
         white-space: nowrap !important;
         
-        /* 3. CĂN CHỈNH TỰ ĐỘNG */
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
-        min-width: 0px !important;         /* KHÔNG để min-width cố định */
-        
-        /* 4. DECORATION */
+        min-width: 0px !important;
         font-family: 'JetBrains Mono', monospace;
         transition: all 0.2s;
         box-shadow: 0 0 10px rgba(255, 0, 110, 0.5);
@@ -328,7 +311,7 @@ def loadPageStyle():
         transform: translateY(-2px);
     }
     div[data-testid="column"] {
-        padding-left: 1px !important;  /* Giảm từ 3px xuống 1px */
+        padding-left: 1px !important;
         padding-right: 1px !important;
     }
     /* ── Sidebar ── */
@@ -544,19 +527,81 @@ def loadPageStyle():
         pointer-events: none;
         z-index: 1000;
     }
+                
+    header[data-testid="stHeader"] {
+    background: #0a0e27 !important;
+    box-shadow: none !important;
+    border-bottom: none !important;
+    }
     </style>
     """, unsafe_allow_html=True)
     
-    # Add signature
-    st.markdown('<div class="pixel-signature">PJ</div>', unsafe_allow_html=True)
+    components.html("""
+    <script>
+    (function hide() {
+        var btns = window.parent.document.querySelectorAll('header button');
+        var found = false;
+        btns.forEach(function(btn) {
+            if (btn.innerText && btn.innerText.trim() === 'Deploy') {
+                btn.style.display = 'none';
+                found = true;
+            }
+        });
+        if (!found) setTimeout(hide, 300);
+    })();
+    </script>
+    """, height=0)
     
 def loadPageFooter():
-    st.markdown("---")
     st.markdown(
-        '<p style="text-align:center;color:#c77dff;font-size:0.7rem;text-shadow:0 0 5px #9d4edd;letter-spacing:1px;">'
-        'FUTOSHIKI SOLVER · PROJECT 2 · GROUP NOTAI</p>',
+        '<hr style="border-color:#0a0e27;margin:0;">'
+        '<p style="text-align:center;color:#0a0e27;font-size:0.7rem;">FUTOSHIKI SOLVER</p>',
         unsafe_allow_html=True,
     )
 def loadPageHeader():
     st.markdown('<div class="hero-title">🧩 FUTOSHIKI SOLVER</div>', unsafe_allow_html=True)
-    st.markdown('<div class="hero-sub">AI Puzzle Solver · Step-by-step Animation · KB Trace Log</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-sub">FUTOSHIKI SOLVER · GROUP 03 · GROUP NON-AI</div>', unsafe_allow_html=True)
+
+def render_badge(text, badge_class):
+    """Helper to render a stat badge."""
+    return f'<span class="stat-badge {badge_class}">{text}</span>'
+
+def glass_card_open():
+    """Open a glass card container."""
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+
+def glass_card_close():
+    """Close a glass card container."""
+    st.markdown('</div>', unsafe_allow_html=True)
+
+def renderGridLegend():
+    """Render Grid Legend with colored blocks"""
+    return '''**Grid Legend:**
+<div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;">
+<div style="display:flex;align-items:center;gap:1rem;"><span style="display:inline-block;width:24px;height:24px;background:#c77dff;border:2px solid #9d4edd;"></span>Given (provided in the puzzle)</div>
+<div style="display:flex;align-items:center;gap:1rem;"><span style="display:inline-block;width:24px;height:24px;background:#00ff88;border:2px solid #00cc66;"></span>Solved (found solutions)</div>
+<div style="display:flex;align-items:center;gap:1rem;"><span style="display:inline-block;width:24px;height:24px;background:#ff006e;border:2px solid #ff006e;"></span>Active (currently being processed)</div>
+</div>'''
+
+def renderKBLegend():
+    """Render KB Legend with colored blocks"""
+    return '''**KB Legend:**
+<div style="display:flex;flex-direction:column;gap:0.5rem;">
+<div style="display:flex;align-items:center;gap:1rem;"><span style="display:inline-block;width:24px;height:24px;background:#c77dff;border:2px solid #9d4edd;"></span>Given – fixed domain</div>
+<div style="display:flex;align-items:center;gap:1rem;"><span style="display:inline-block;width:24px;height:24px;background:#00ff88;border:2px solid #00cc66;"></span>Solved – confirmed solution</div>
+<div style="display:flex;align-items:center;gap:1rem;"><span style="display:inline-block;width:24px;height:24px;background:#ff006e;border:2px solid #ff006e;"></span>Active – processed in this step</div>
+<div style="display:flex;align-items:center;gap:1rem;"><span style="display:inline-block;width:24px;height:24px;background:#ffaa00;border:2px solid #ff9900;"></span>Narrowed – domain narrowed down</div>
+<div style="display:flex;align-items:center;gap:1rem;"><span style="display:inline-block;width:24px;height:24px;background:rgba(100,80,150,0.2);border:2px solid #9d9dff;"></span>Full domain (1...N)</div>
+</div>'''
+
+def renderKBTabLegend():
+    """Render KB Tab legend - compact horizontal version"""
+    return (
+        '<div style="font-size:0.72rem;color:#c77dff;margin-bottom:0.5rem;font-family:JetBrains Mono,monospace;text-shadow:0 0 5px #9d4edd;display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">'
+        '<div style="display:flex;align-items:center;gap:0.5rem;"><span style="display:inline-block;width:16px;height:16px;background:#c77dff;border:1px solid #9d4edd;"></span>GIVEN</div>'
+        '<div style="display:flex;align-items:center;gap:0.5rem;"><span style="display:inline-block;width:16px;height:16px;background:#00ff88;border:1px solid #00cc66;"></span>SOLVED</div>'
+        '<div style="display:flex;align-items:center;gap:0.5rem;"><span style="display:inline-block;width:16px;height:16px;background:#ff006e;border:1px solid #ff006e;"></span>ACTIVE</div>'
+        '<div style="display:flex;align-items:center;gap:0.5rem;"><span style="display:inline-block;width:16px;height:16px;background:#ffaa00;border:1px solid #ff9900;"></span>NARROWED</div>'
+        '<div style="display:flex;align-items:center;gap:0.5rem;"><span style="display:inline-block;width:16px;height:16px;background:rgba(100,80,150,0.2);border:1px solid #9d9dff;"></span>FULL</div>'
+        '</div>'
+    )

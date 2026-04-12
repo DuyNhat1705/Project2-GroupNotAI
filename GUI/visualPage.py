@@ -1,26 +1,72 @@
-import os         # thao tác file/folder, biến môi trường
-import time       # đo thời gian, delay
-import streamlit as st                    # build web app bằng Python
-import streamlit.components.v1 as components  # nhúng HTML/JS vào streamlit
+import os
+import time
+import streamlit as st
+import streamlit.components.v1 as components
 
-from GUI import constants, helpers, visualRender
+from GUI import constants, helpers, visualRender, webStyle
 
 from problem.futoshiki import Futoshiki
 from algorithms.algorithm_factory import get_algorithm
 from utils.logger import step_logger, SolverTimeoutError
 
-def run_solver_with_steps(algo_key, puzzle, time_out):
-    """
-    Chạy solver và thu thập từng bước giải qua step_logger singleton.
-    Tất cả algorithm (FC, BT, A*, BC) tự log bằng step_logger.log_step().
-    Mỗi step: { step_num, action, tag, cell, value, domains_snapshot, facts_count }
-    """
+def run_solver_with_steps(algo_key, puzzle, time_out, heuristic_option=None):
     step_logger.reset(puzzle, time_out=time_out)
     algo = get_algorithm(algo_key)
-    solution = algo.solve(puzzle)
+    if algo_key == "astar" and heuristic_option is not None:
+        solution  = algo.solve(puzzle, option=heuristic_option)
+    else:
+        solution = algo.solve(puzzle)
     steps = list(step_logger.steps)
     return solution, steps, step_logger.execution_time
-def render_visual_page(selected_input,selected_algo_name,solve_btn,step_delay, slider_key):
+def reset_puzzle_state():
+    st.session_state.current_step = 0
+    st.session_state.solved = False
+    st.session_state.auto_playing = False
+
+def get_available_inputs():
+    return sorted([f.replace('.txt', '') for f in os.listdir(constants.INPUTS_DIR)
+                   if f.startswith('input-') and f.endswith('.txt')])
+def render_visual_nav():
+    st.markdown("### CONFIGURE")
+    available = get_available_inputs()
+    selected_input = st.selectbox(
+        "Puzzle", options=available,
+        format_func=lambda x: x.upper().replace('-', ' '),
+        on_change=reset_puzzle_state,
+        label_visibility="collapsed",
+    )
+    st.markdown('<div class="section-title" style="margin-top:0.8rem">ALGORITHM</div>', unsafe_allow_html=True)
+    selected_algo_name = st.radio(
+        "Algorithm", options=list(constants.ALGO_MAP.keys()),on_change = reset_puzzle_state, label_visibility="collapsed",
+    )
+    selected_heuristic = 2
+    if selected_algo_name == "A* Search":
+        st.markdown('<div class="section-title" style="margin-top:0.5rem">A* HEURISTIC</div>', unsafe_allow_html=True)
+        selected_heuristic_name = st.radio(
+            "Heuristic", options=list(constants.HEURISTIC_MAP.keys()), label_visibility="collapsed",
+        )
+        selected_heuristic = constants.HEURISTIC_MAP[selected_heuristic_name]
+        print(selected_heuristic)
+    st.markdown("---")
+    solve_btn = st.button("▶ SOLVE & CAPTURE STEPS", use_container_width=True)
+
+    st.markdown('<div class="section-title" style="margin-top:0.5rem">ANIMATION SPEED</div>', unsafe_allow_html=True)
+    speed_label = st.select_slider(
+        "Speed", options=list(constants.STEP_DELAY_OPTIONS.keys()),
+        value="Normal (0.5s)", label_visibility="collapsed",
+    )
+    step_delay = constants.STEP_DELAY_OPTIONS[speed_label]
+
+    if st.session_state.solved:
+        st.markdown("---")
+        st.markdown(f"**{len(st.session_state.steps)}** steps · **{st.session_state.elapsed:.1f} ms**")
+        if st.session_state.solution:
+            st.markdown(webStyle.render_badge("SOLVED", "badge-green"), unsafe_allow_html=True)
+        else:
+            st.markdown(webStyle.render_badge("NO SOLUTION", "badge-magenta"), unsafe_allow_html=True)
+
+    return selected_input, selected_algo_name, solve_btn, step_delay, selected_heuristic
+def render_visual_page(selected_input,selected_algo_name,solve_btn,step_delay, slider_key, selected_heuristic):
     try:
         puzzle = Futoshiki(selected_input)
         load_ok = True
@@ -35,14 +81,12 @@ def render_visual_page(selected_input,selected_algo_name,solve_btn,step_delay, s
         st.session_state.solve_count += 1   # force slider key change
         with st.spinner(f"⏳ Running **{selected_algo_name}** and capturing steps..."):
             try:
-                solution, steps, elapsed = run_solver_with_steps(constants.ALGO_MAP[selected_algo_name], puzzle, time_out=constants.TIME_OUT)
+                solution, steps, elapsed = run_solver_with_steps(constants.ALGO_MAP[selected_algo_name], puzzle, time_out=constants.TIME_OUT, heuristic_option=selected_heuristic)
                 st.session_state.steps    = steps
                 st.session_state.solution = solution
                 st.session_state.elapsed  = elapsed
                 st.session_state.solved   = True
                 st.session_state.solve_error = None
-                st.session_state.last_input  = selected_input
-                st.session_state.last_algo   = selected_algo_name
             except SolverTimeoutError as e:
                 st.session_state.solved = False
                 st.error(f"🛑 {str(e)}")
@@ -53,7 +97,6 @@ def render_visual_page(selected_input,selected_algo_name,solve_btn,step_delay, s
     if st.session_state.get('solve_error'):
         st.error(f" Error: {st.session_state.solve_error}")
 
-    # ─── Auto-play: cập nhật current_step trước khi bất kỳ widget nào render ─────────────────
     _trigger_rerun = False
     if st.session_state.auto_playing and st.session_state.solved:
         _play_steps = st.session_state.steps
@@ -64,9 +107,6 @@ def render_visual_page(selected_input,selected_algo_name,solve_btn,step_delay, s
         else:
             st.session_state.auto_playing = False
 
-    # Sync slider một lần duy nhất, TRƯỚC khi slider widget được tạo ra.
-    # Mọi thay đổi current_step (auto-play, nút bấm) đều được xử lý ở đây.
-    # Streamlit cho phép ghi session_state[key] trước khi widget có key đó render.
     st.session_state[slider_key] = st.session_state.current_step
 
     # ─── Main Layout ───────────────────────────────────────────────────────────────
@@ -106,7 +146,7 @@ def render_visual_page(selected_input,selected_algo_name,solve_btn,step_delay, s
             # ── Animation controls (only when solved) ──
             if st.session_state.solved and steps:
                 st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-                st.markdown("#### 🎬 ANIMATION CONTROLS")
+                st.markdown("#### ANIMATION CONTROLS")
 
                 # on_change chỉ gọi khi USER kéo — không gọi khi auto-play set session_state[key]
                 def _on_slider_change():
@@ -124,8 +164,7 @@ def render_visual_page(selected_input,selected_algo_name,solve_btn,step_delay, s
 
                 # Step info
                 if cur_step:
-                    tag_colors = {'given': 'badge-magenta', 'deduced': 'badge-green', 'backtrack': 'badge-yellow'}
-                    tc = tag_colors.get(cur_step['tag'], 'badge-blue')
+                    tc = constants.TAG_BADGE_MAP.get(cur_step['tag'], 'badge-blue')
                     st.markdown(
                         f'<span class="stat-badge {tc}">{cur_step["tag"].upper()}</span>'
                         f'<span class="stat-badge badge-cyan">CELL ({cur_step["cell"][0]},{cur_step["cell"][1]})</span>'
@@ -138,8 +177,7 @@ def render_visual_page(selected_input,selected_algo_name,solve_btn,step_delay, s
 
                 st.markdown("<br>", unsafe_allow_html=True)
 
-                # Control buttons
-                b1, b2, b3, b4, b5 = st.columns(5)
+                
                 row1_cols = st.columns(3)
                 row2_cols = st.columns(2)
                 def _set_step(val):
@@ -197,11 +235,7 @@ def render_visual_page(selected_input,selected_algo_name,solve_btn,step_delay, s
 
                 with tab_kb:
                     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-                    st.markdown(
-                        '<div style="font-size:0.72rem;color:#c77dff;margin-bottom:0.5rem;font-family:JetBrains Mono,monospace;text-shadow:0 0 5px #9d4edd;">'
-                        '🟪 GIVEN &nbsp; 🟩 SOLVED &nbsp; 🟨 ACTIVE &nbsp; 🟧 NARROWED &nbsp; ··· FULL</div>',
-                        unsafe_allow_html=True
-                    )
+                    st.markdown(webStyle.renderKBTabLegend(), unsafe_allow_html=True)
                     if cur_step:
                         # Domain stats
                         snap = cur_step['domains_snapshot']
@@ -228,25 +262,25 @@ def render_visual_page(selected_input,selected_algo_name,solve_btn,step_delay, s
     **After solving:**
     - Use the slider or arrow keys **◀ / ▶** to step through
     - Press **▶ Play** for auto-play animation
-    - Tab ** Step Log** – to view step-by-step solutions
-    - Tab ** KB Domains** – to view KB domain status at each step
+    - Tab **Step Log** – to view step-by-step solutions
+    - Tab **KB Domains** – to view KB domain status at each step
 
     **Grid Legend:**
-    | | |
-    |---|---|
-    | 🟪 | Given (provided in the puzzle) |
-    | 🟩 | Solved (found solutions) |
-    | 🟨 | Active (currently being processed) |
+    <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;">
+    <div style="display:flex;align-items:center;gap:1rem;"><span style="display:inline-block;width:24px;height:24px;background:#c77dff;border:2px solid #9d4edd;"></span>Given (provided in the puzzle)</div>
+    <div style="display:flex;align-items:center;gap:1rem;"><span style="display:inline-block;width:24px;height:24px;background:#00ff88;border:2px solid #00cc66;"></span>Solved (found solutions)</div>
+    <div style="display:flex;align-items:center;gap:1rem;"><span style="display:inline-block;width:24px;height:24px;background:#ff006e;border:2px solid #ff006e;"></span>Active (currently being processed)</div>
+    </div>
 
     **KB Legend:**
-    | | |
-    |---|---|
-    | 🟪 | Given – fixed domain |
-    | 🟩 | Solved – confirmed solution |
-    | 🟨 | Active – processed in this step |
-    | 🟧 | Narrowed – domain narrowed down |
-    | ··· | Full domain (1...N) |
-    """)
+    <div style="display:flex;flex-direction:column;gap:0.5rem;">
+    <div style="display:flex;align-items:center;gap:1rem;"><span style="display:inline-block;width:24px;height:24px;background:#c77dff;border:2px solid #9d4edd;"></span>Given – fixed domain</div>
+    <div style="display:flex;align-items:center;gap:1rem;"><span style="display:inline-block;width:24px;height:24px;background:#00ff88;border:2px solid #00cc66;"></span>Solved – confirmed solution</div>
+    <div style="display:flex;align-items:center;gap:1rem;"><span style="display:inline-block;width:24px;height:24px;background:#ff006e;border:2px solid #ff006e;"></span>Active – processed in this step</div>
+    <div style="display:flex;align-items:center;gap:1rem;"><span style="display:inline-block;width:24px;height:24px;background:#ffaa00;border:2px solid #ff9900;"></span>Narrowed – domain narrowed down</div>
+    <div style="display:flex;align-items:center;gap:1rem;"><span style="display:inline-block;width:24px;height:24px;background:rgba(100,80,150,0.2);border:2px solid #9d9dff;"></span>Full domain (1...N)</div>
+    </div>
+    """, unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
 
     # ─── Trigger rerun cho frame tiếp theo của auto-play ───────────────────────────────

@@ -103,7 +103,7 @@ class SATSolver(BaseAlgorithm):
                     # Update board state
                     if problem.grid[r - 1][c - 1] == 0:  # log it if it wasn't a starting clue
                         problem.grid[r - 1][c - 1] = v
-                        domains[(r - 1, c - 1)] = {v}
+                        domains[(r, c)] = {v}
                         # Log the final deduced cell
                         step_logger.log_step(r, c, v, tag='deduced',
                                              domains=dict(domains),
@@ -125,7 +125,7 @@ class SATSolver(BaseAlgorithm):
         for r in range(problem.size):
             for c in range(problem.size):
                 if problem.grid[r][c] == 0:
-                    domains[(r, c)] = set(range(1, problem.size + 1))
+                    domains[(r + 1, c + 1)] = set(range(1, problem.size + 1)) # 1-indexed
                 else:
-                    domains[(r, c)] = {int(problem.grid[r][c])}
+                    domains[(r + 1, c + 1)] = {int(problem.grid[r][c])} # 1-indexed
         return domains

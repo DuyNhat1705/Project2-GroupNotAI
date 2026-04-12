@@ -1,19 +1,12 @@
 from GUI.helpers import h_symbol, v_symbol
+from GUI.constants import TAG_STYLE_MAP
 import streamlit as st
-# Hàm này render bảng Futoshiki thành HTML để hiển thị trên giao diện
+
 def render_grid_html(puzzle, step=None, active_cell=None):
-    """
-    Render grid HTML.
-    - step=None → show original puzzle (no solution)
-    - step dict  → show state at that step using domains_snapshot
-    - active_cell → highlight the current cell being assigned
-    """
     n = puzzle.size
     original = puzzle.grid
     given_cells = {(i, j) for i in range(n) for j in range(n) if original[i][j] != 0}
 
-    # Build value map from snapshot
-    # là cái này sẽ hiển thị bản dựa vào domain grid, nếu như mà domain còn 1 value thì sẽ log lại trên  val_map
     val_map = {}
     if step is not None:
         for (ri, cj), dom in step['domains_snapshot'].items():
@@ -57,19 +50,7 @@ def render_grid_html(puzzle, step=None, active_cell=None):
     html += '</table>'
     return html
 
-# Hàm này render danh sách các bước giải thành một HTML widget có scroll, highlight bước hiện tại.
 def render_step_log_html(steps, current_idx):
-    """
-    Render scrollable step log dưới dạng HTML đầy đủ (inline CSS + JS).
-    Dùng với st.components.v1.html() để chạy được JavaScript scrollIntoView.
-    """
-    # Màu sắc cho từng loại bước
-    tag_styles = {
-        'given':    ('GIVEN',    '#00f5ff', 'rgba(0, 245, 255, 0.15)'),
-        'deduced':  ('DEDUCED',  '#00ff88', 'rgba(0, 255, 136, 0.15)'),
-        'backtrack':('BACKTRACK','#ffdd00', 'rgba(255, 221, 0, 0.15)'),
-    }
-
     items_html = ''
     for idx, s in enumerate(steps):
         is_cur = (idx == current_idx)
@@ -79,7 +60,7 @@ def render_step_log_html(steps, current_idx):
         num_bg     = '#00f5ff'               if is_cur else 'rgba(157,78,221,0.3)'
         num_color  = '#0a0e27'               if is_cur else '#c77dff'
 
-        label, color, bg = tag_styles.get(s['tag'], (s['tag'], '#0099ff', 'rgba(0, 153, 255, 0.15)'))
+        label, color, bg = TAG_STYLE_MAP.get(s['tag'], (s['tag'], '#0099ff', 'rgba(0, 153, 255, 0.15)'))
         tag_span = (f'<span style="display:inline-block;padding:2px 6px;border-radius:0px;'
                     f'font-size:0.68rem;font-weight:700;margin-right:5px;'
                     f'background:{bg};color:{color};border:1px solid {color};">{label}</span>')
@@ -102,17 +83,14 @@ def render_step_log_html(steps, current_idx):
           </div>
         </div>'''
 
-    # JS: ẩn container trước, scroll instant, hiện lại → user không thấy scroll từ đầu
     scroll_js = '''
     <script>
       (function() {
         var wrapper = document.getElementById('log-wrapper');
         var el      = document.getElementById('step-active');
         if (el) {
-          // scrollIntoView instant: không có animation nên user không thấy trạng thái scroll từ 0
           el.scrollIntoView({ behavior: 'instant', block: 'nearest' });
         }
-        // Hiện lại sau khi đã scroll đúng vị trí
         if (wrapper) wrapper.style.visibility = 'visible';
       })();
     </script>'''
@@ -132,7 +110,6 @@ def render_step_log_html(steps, current_idx):
       ::-webkit-scrollbar-thumb {{ background: rgba(0, 245, 255, 0.4); border-radius: 99px; }}
     </style></head>
     <body>
-      <!-- visibility:hidden để ẩn trong khi JS chưa scroll đúng vị trí -->
       <div id="log-wrapper" style="max-height:215px;overflow-y:auto;padding-right:4px;visibility:hidden;">
         {items_html}
       </div>
@@ -141,9 +118,7 @@ def render_step_log_html(steps, current_idx):
     </html>'''  
     return full_html
 
-# Hàm này render KB domains dưới dạng một bảng HTML có màu sắc. (cái bảng domain á)
 def render_kb_domains_html(puzzle, step, highlight_cell=None):
-    """Render KB domains as a color-coded grid table."""
     n = puzzle.size
     given_cells = {(i+1, j+1) for i in range(n) for j in range(n) if puzzle.grid[i][j] != 0}
     full_size = n
@@ -200,7 +175,6 @@ def render_kb_domains_html(puzzle, step, highlight_cell=None):
     html += '</table>'
     return html
 def apply_grid_size(grid_size):
-    # Tính toán kích thước ô dựa trên size của puzzle
     if grid_size <= 5:
         base_size = 52
     elif grid_size <= 7:
@@ -208,7 +182,6 @@ def apply_grid_size(grid_size):
     else:
         base_size = 30  # Size 9x9
 
-    # Chỉ render đúng phần biến :root, CSS sẽ tự động hiểu cho các class bên dưới
     st.markdown(f"""
         <style>
         :root {{
