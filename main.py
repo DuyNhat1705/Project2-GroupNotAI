@@ -2,7 +2,7 @@ from problem.futoshiki import Futoshiki
 from algorithms.algorithm_factory import get_algorithm
 
 def main():
-    algorithm = get_algorithm('backtracking')
+    algorithm = get_algorithm('bf')
     problem = Futoshiki('input-01')
     # problem.printFutoshiki()
 
