@@ -295,6 +295,8 @@ class AStar(BaseAlgorithm):
         return valid
 
     def solve(self, problem, option = 2):
+        if hasattr(step_logger, 'reset'):
+            step_logger.reset(problem)
 
         if option == 1:
             print("Running A* algorithm on Heuristic 1...")
@@ -305,6 +307,12 @@ class AStar(BaseAlgorithm):
             option = 2
 
         start_time = time.perf_counter()
+
+        for r in range(problem.size):
+            for c in range(problem.size):
+                if problem.grid[r][c] != 0:
+                    domains = step_logger.grid_to_domains(problem.grid) if hasattr(step_logger, 'grid_to_domains') else None
+                    step_logger.log_step(r, c, problem.grid[r][c], tag = "given", domains = domains)
 
         # Declared nessesscary variable
         pq = []
@@ -344,11 +352,9 @@ class AStar(BaseAlgorithm):
                     step_logger.execution_time = (end_time - start_time) * 1000
                     step_logger.memory_usage = sys.getsizeof(pq) / 1024
 
-                    
-                    print("execution_time", f"{end_time - start_time:.4f}s")
-                    print("nodes_expanded", counter)
-                    print("memory_usage", f"{sys.getsizeof(pq) / 1024:.2f} KB")
-                    
+                    # print("execution_time", f"{end_time - start_time:.4f}s")
+                    # print("nodes_expanded", counter)
+                    # print("memory_usage", f"{sys.getsizeof(pq) / 1024:.2f} KB")
                     
                     print(f"Goal found!")
                     return curr_grid
