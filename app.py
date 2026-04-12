@@ -1,4 +1,3 @@
-
 import streamlit as st
 from GUI import webStyle, visualPage, analyticsPage
 def init_state():
