@@ -66,17 +66,17 @@ class BruteForce(BaseAlgorithm):
             return self.recursion(solution, problem, indexRow, indexCol, n)
         
     def solve(self, problem):
-        if hasattr(step_logger, 'reset'):
-            step_logger.reset(problem)
+        # if hasattr(step_logger, 'reset'):
+        #     step_logger.reset(problem)
             
         n = problem.size
         solution = problem.grid
 
-        for r in range(n):
-            for c in range(n):
-                if solution[r][c] != 0:
-                    domains = step_logger.grid_to_domains(solution) if hasattr(step_logger, 'grid_to_domains') else None
-                    step_logger.log_step(r, c, solution[r][c], tag="given", domains=domains)
+        # for r in range(n):
+        #     for c in range(n):
+        #         if solution[r][c] != 0:
+        #             domains = step_logger.grid_to_domains(solution) if hasattr(step_logger, 'grid_to_domains') else None
+        #             step_logger.log_step(r, c, solution[r][c], tag="given", domains=domains)
 
         n = problem.size
         solution = problem.grid
