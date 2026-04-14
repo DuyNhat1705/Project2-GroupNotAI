@@ -24,7 +24,7 @@ def run_solver_worker(solver_class, problem, queue, astar_option=None):
     Runs the solver and puts the logger results into the queue.
     """
     solver = solver_class()
-
+    step_logger.reset(problem)
     # Run the solver — pass heuristic option for AStar
     if astar_option is not None:
         grid = solver.solve(problem, option=astar_option)

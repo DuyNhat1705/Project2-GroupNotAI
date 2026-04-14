@@ -19,7 +19,6 @@ class BackwardChaining(BaseAlgorithm):
         self.kb = KnowledgeBase(problem)
         self.domains = self.init_domain(problem)
 
-        step_logger.reset(problem)
         start_time = time.perf_counter()
         print(f"Backward chaining for {problem.size}x{problem.size}...\n")
 
@@ -28,12 +27,7 @@ class BackwardChaining(BaseAlgorithm):
             for c in range(problem.size):
                 val = problem.grid[r][c]
                 if val != 0:
-                    step_logger.log_step(r + 1, c + 1, val, tag='given',
-                                         domains=dict(self.domains),
-                                         facts_count=len(self.kb.obs_facts))
-
-                    if hasattr(self, 'forward_check_kb'):
-                        self.forward_check_kb(problem, self.domains, r, c, val)
+                    self.forward_check_kb(problem, self.domains, r, c, val)
 
         # Recursive search
         if self.backtrack_solve(problem, self.domains):

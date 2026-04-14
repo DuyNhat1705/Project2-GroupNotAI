@@ -28,9 +28,10 @@ TAG_BADGE_MAP = {
 }
 
 TAG_STYLE_MAP = {
-    'given': ('GIVEN', '#00f5ff', 'rgba(0, 245, 255, 0.15)'),
+    'given': ('GIVEN', '#ff4d4d', 'rgba(255, 77, 77, 0.15)'),
     'deduced': ('DEDUCED', '#00ff88', 'rgba(0, 255, 136, 0.15)'),
     'backtrack': ('BACKTRACK', '#ffdd00', 'rgba(255, 221, 0, 0.15)'),
+    'try': ('TRY', '#00f5ff', 'rgba(0, 245, 255, 0.15)')
 }
 COLOR_MAP = {
     "Backward Chaining": "#7b2ff7", 

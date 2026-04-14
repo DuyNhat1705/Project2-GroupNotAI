@@ -10,7 +10,6 @@ class ForwardChaining(BaseAlgorithm):
         super().__init__("Forward Chaining", params)
 
     def solve(self, puzzle):
-        step_logger.reset(puzzle)
         start_time = time.perf_counter()
 
         kb = KnowledgeBase(puzzle)
@@ -21,7 +20,6 @@ class ForwardChaining(BaseAlgorithm):
             if hasattr(fact, 'name') and fact.name == 'Given':
                 i, j, v = fact.args[0].value, fact.args[1].value, fact.args[2].value
                 self._add_val(kb, i, j, v)
-                step_logger.log_step(i, j, v, tag='given',domains=dict(kb.domains),facts_count=len(kb.obs_facts))
 
         result_kb = self._backtrack(kb)
         step_logger.execution_time = (time.perf_counter() - start_time) * 1000

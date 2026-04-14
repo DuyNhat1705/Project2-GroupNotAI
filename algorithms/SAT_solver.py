@@ -10,7 +10,6 @@ class SATSolver(BaseAlgorithm):
         super().__init__("SAT Solver", params)
 
     def solve(self, problem):
-        step_logger.reset(problem)
         start_time = time.perf_counter()
         print(f"SAT Solver for {problem.size}x{problem.size}...\n")
 
@@ -36,9 +35,6 @@ class SATSolver(BaseAlgorithm):
                 if val != 0:
                     # Unit Clause: force the value
                     solver.add_clause([var_id(r, c, val)])
-                    step_logger.log_step(r, c, val, tag='given',
-                                         domains=dict(domains),
-                                         facts_count=1)
 
         # cell uniqueness
         for r in range(1, sz + 1):

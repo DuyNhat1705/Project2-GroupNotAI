@@ -35,7 +35,6 @@ def main():
         if st.session_state.page == "Solver":
             selected_input, selected_algo_name, solve_btn, step_delay, selected_heuristic = visualPage.render_visual_nav()
         elif st.session_state.page == "Analytics":
-            st.markdown("### ANALYTICS")
             filtered_df = analyticsPage.render_analytics_nav()
                     
     if st.session_state.page == "Solver":

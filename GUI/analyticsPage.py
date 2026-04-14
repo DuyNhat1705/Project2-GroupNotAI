@@ -13,6 +13,7 @@ def load_analytics_data():
         st.error(f"Error loading analytics data: {e}")
         return None
 def render_analytics_nav():
+    st.markdown("### ANALYTICS")
     df = load_analytics_data()
     if df is None: return
     df['Space (Steps)'] = pd.to_numeric(df['Space (Steps)'], errors='coerce')

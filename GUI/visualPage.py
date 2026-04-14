@@ -217,10 +217,12 @@ def render_visual_page(selected_input,selected_algo_name,solve_btn,step_delay, s
                     n_given_steps    = len(step_logger._given_cells)
                     n_deduced_steps  = sum(1 for s in steps if s['tag'] == 'deduced')
                     n_backtrack_steps= sum(1 for s in steps if s['tag'] == 'backtrack')
+                    n_try_steps      = sum(1 for s in steps if s['tag'] == 'try')
                     st.markdown(
-                        f'<span class="stat-badge badge-cyan">{total} steps</span>'
+                        f'<span class="stat-badge badge-orange">{total} steps</span>'
                         f'<span class="stat-badge badge-magenta">{n_given_steps} given</span>'
-                        f'<span class="stat-badge badge-green">{n_deduced_steps} deduced</span>'
+                        + (f'<span class="stat-badge badge-cyan">{n_try_steps} try</span>' if n_try_steps else '')
+                        + (f'<span class="stat-badge badge-green">{n_deduced_steps} deduced</span>' if n_deduced_steps else '')
                         + (f'<span class="stat-badge badge-yellow">{n_backtrack_steps} backtrack</span>' if n_backtrack_steps else ''),
                         unsafe_allow_html=True
                     )
@@ -284,4 +286,5 @@ def render_visual_page(selected_input,selected_algo_name,solve_btn,step_delay, s
 
     # ─── Trigger rerun cho frame tiếp theo của auto-play ───────────────────────────────
     if _trigger_rerun:
+        time.sleep(0.5)
         st.rerun()

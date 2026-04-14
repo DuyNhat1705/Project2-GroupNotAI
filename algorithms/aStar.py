@@ -295,8 +295,6 @@ class AStar(BaseAlgorithm):
         return valid
 
     def solve(self, problem, option = 2):
-        if hasattr(step_logger, 'reset'):
-            step_logger.reset(problem)
 
         if option == 1:
             print("Running A* algorithm on Heuristic 1...")
@@ -307,13 +305,6 @@ class AStar(BaseAlgorithm):
             option = 2
 
         start_time = time.perf_counter()
-
-        for r in range(problem.size):
-            for c in range(problem.size):
-                if problem.grid[r][c] != 0:
-                    domains = step_logger.grid_to_domains(problem.grid) if hasattr(step_logger, 'grid_to_domains') else None
-                    step_logger.log_step(r, c, problem.grid[r][c], tag = "given", domains = domains)
-
         # Declared nessesscary variable
         pq = []
         counter = 0
@@ -342,7 +333,7 @@ class AStar(BaseAlgorithm):
                 continue
             closed.add(state_key)
 
-            step_logger.log_step(last_move[0][0], last_move[0][1], last_move[1], tag= "deduced", domains = step_logger.grid_to_domains(curr_grid))
+            step_logger.log_step(last_move[0][0], last_move[0][1], last_move[1], tag= "try", domains = step_logger.grid_to_domains(curr_grid))
             
             # If there is no more cells
             # Check if is it the goal state

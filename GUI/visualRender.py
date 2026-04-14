@@ -87,9 +87,10 @@ def render_step_log_html(steps, current_idx):
     <script>
       (function() {
         var wrapper = document.getElementById('log-wrapper');
-        var el      = document.getElementById('step-active');
-        if (el) {
-          el.scrollIntoView({ behavior: 'instant', block: 'nearest' });
+        var el = document.getElementById('step-active');
+
+        if (wrapper && el) {
+            wrapper.scrollTop = el.offsetTop - wrapper.offsetTop;
         }
         if (wrapper) wrapper.style.visibility = 'visible';
       })();
