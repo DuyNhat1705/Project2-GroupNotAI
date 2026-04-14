@@ -143,7 +143,7 @@ def _gen_charts(df):
     df_solved = df[df['Status'] == 'Solved']
     sns.barplot(data=df_solved, x='Puzzle size', y='Space (Steps)', hue='Solver', ax=ax2, palette=palette)
     ax2.set_title('Search Space Complexity', fontsize=14)
-    ax2.set_ylabel('Total Logged Steps (Given + Try + Backtrack + Deduced)')
+    ax2.set_ylabel('Total Logged Steps (Try + Backtrack + Deduced)')
     ax2.set_yscale('log')
     ax2.legend(title='Solver', bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0)
     plt.tight_layout()
