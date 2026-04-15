@@ -2,296 +2,345 @@
     {
         "Puzzle size":"4x4_1",
         "Solver":"Backward Chaining",
-        "Time (ms)":80.3188,
-        "Space (Steps)":38,
+        "Time (ms)":37.5859999913,
+        "Space (Steps)":36,
         "Status":"Solved"
     },
     {
         "Puzzle size":"4x4_1",
         "Solver":"Forward Chaining",
-        "Time (ms)":6.2677999999,
-        "Space (Steps)":16,
+        "Time (ms)":5.0996000064,
+        "Space (Steps)":14,
         "Status":"Solved"
     },
     {
         "Puzzle size":"4x4_1",
         "Solver":"SAT",
-        "Time (ms)":0.8497,
-        "Space (Steps)":16,
+        "Time (ms)":1.2055999832,
+        "Space (Steps)":14,
         "Status":"Solved"
     },
     {
         "Puzzle size":"4x4_1",
         "Solver":"A* H1",
-        "Time (ms)":0.5682,
-        "Space (Steps)":16,
+        "Time (ms)":0.3361999989,
+        "Space (Steps)":14,
         "Status":"Solved"
     },
     {
         "Puzzle size":"4x4_1",
         "Solver":"A* H2",
-        "Time (ms)":0.6218,
-        "Space (Steps)":16,
+        "Time (ms)":0.3800999839,
+        "Space (Steps)":14,
         "Status":"Solved"
     },
     {
         "Puzzle size":"4x4_1",
         "Solver":"Backtracking",
-        "Time (ms)":5.0202000001,
-        "Space (Steps)":238,
+        "Time (ms)":3.6185999634,
+        "Space (Steps)":236,
         "Status":"Solved"
+    },
+    {
+        "Puzzle size":"4x4_1",
+        "Solver":"Brute Force",
+        "Time (ms)":300000.0,
+        "Space (Steps)":0,
+        "Status":"Timeout"
     },
     {
         "Puzzle size":"4x4_2",
         "Solver":"Backward Chaining",
-        "Time (ms)":123.6111000001,
+        "Time (ms)":90.7816999825,
         "Space (Steps)":92,
         "Status":"Solved"
     },
     {
         "Puzzle size":"4x4_2",
         "Solver":"Forward Chaining",
-        "Time (ms)":7.6889999999,
+        "Time (ms)":6.6149000195,
         "Space (Steps)":16,
         "Status":"Solved"
     },
     {
         "Puzzle size":"4x4_2",
         "Solver":"SAT",
-        "Time (ms)":1.0106,
+        "Time (ms)":1.1618999997,
         "Space (Steps)":16,
         "Status":"Solved"
     },
     {
         "Puzzle size":"4x4_2",
         "Solver":"A* H1",
-        "Time (ms)":1.121,
+        "Time (ms)":0.5690999678,
         "Space (Steps)":34,
         "Status":"Solved"
     },
     {
         "Puzzle size":"4x4_2",
         "Solver":"A* H2",
-        "Time (ms)":1.6832,
+        "Time (ms)":0.6853000377,
         "Space (Steps)":34,
         "Status":"Solved"
     },
     {
         "Puzzle size":"4x4_2",
         "Solver":"Backtracking",
-        "Time (ms)":9.8141,
+        "Time (ms)":8.2381999819,
         "Space (Steps)":696,
         "Status":"Solved"
     },
     {
+        "Puzzle size":"4x4_2",
+        "Solver":"Brute Force",
+        "Time (ms)":300000.0,
+        "Space (Steps)":0,
+        "Status":"Timeout"
+    },
+    {
         "Puzzle size":"5x5_1",
         "Solver":"Backward Chaining",
-        "Time (ms)":102.7919000001,
-        "Space (Steps)":67,
+        "Time (ms)":81.6041999497,
+        "Space (Steps)":63,
         "Status":"Solved"
     },
     {
         "Puzzle size":"5x5_1",
         "Solver":"Forward Chaining",
-        "Time (ms)":22.0598000001,
-        "Space (Steps)":25,
+        "Time (ms)":11.1107000266,
+        "Space (Steps)":21,
         "Status":"Solved"
     },
     {
         "Puzzle size":"5x5_1",
         "Solver":"SAT",
-        "Time (ms)":1.3265,
-        "Space (Steps)":25,
+        "Time (ms)":0.8921999834,
+        "Space (Steps)":21,
         "Status":"Solved"
     },
     {
         "Puzzle size":"5x5_1",
         "Solver":"A* H1",
-        "Time (ms)":3.5978,
-        "Space (Steps)":31,
+        "Time (ms)":0.6146000233,
+        "Space (Steps)":27,
         "Status":"Solved"
     },
     {
         "Puzzle size":"5x5_1",
         "Solver":"A* H2",
-        "Time (ms)":3.8438,
-        "Space (Steps)":31,
+        "Time (ms)":0.7180999964,
+        "Space (Steps)":27,
         "Status":"Solved"
     },
     {
         "Puzzle size":"5x5_1",
         "Solver":"Backtracking",
-        "Time (ms)":8.0393000001,
-        "Space (Steps)":265,
+        "Time (ms)":6.0598999844,
+        "Space (Steps)":261,
         "Status":"Solved"
+    },
+    {
+        "Puzzle size":"5x5_1",
+        "Solver":"Brute Force",
+        "Time (ms)":300000.0,
+        "Space (Steps)":0,
+        "Status":"Timeout"
     },
     {
         "Puzzle size":"5x5_2",
         "Solver":"Backward Chaining",
-        "Time (ms)":206.7113000001,
-        "Space (Steps)":169,
+        "Time (ms)":243.0633999757,
+        "Space (Steps)":168,
         "Status":"Solved"
     },
     {
         "Puzzle size":"5x5_2",
         "Solver":"Forward Chaining",
-        "Time (ms)":21.22,
-        "Space (Steps)":43,
+        "Time (ms)":24.2741999682,
+        "Space (Steps)":42,
         "Status":"Solved"
     },
     {
         "Puzzle size":"5x5_2",
         "Solver":"SAT",
-        "Time (ms)":1.7308,
-        "Space (Steps)":25,
+        "Time (ms)":2.0515000215,
+        "Space (Steps)":24,
         "Status":"Solved"
     },
     {
         "Puzzle size":"5x5_2",
         "Solver":"A* H1",
-        "Time (ms)":11.9144,
-        "Space (Steps)":257,
+        "Time (ms)":10.762400052,
+        "Space (Steps)":256,
         "Status":"Solved"
     },
     {
         "Puzzle size":"5x5_2",
         "Solver":"A* H2",
-        "Time (ms)":15.3038,
-        "Space (Steps)":257,
+        "Time (ms)":13.1908999756,
+        "Space (Steps)":256,
         "Status":"Solved"
     },
     {
         "Puzzle size":"5x5_2",
         "Solver":"Backtracking",
-        "Time (ms)":802.0244000001,
-        "Space (Steps)":16871,
+        "Time (ms)":668.3947999845,
+        "Space (Steps)":16870,
         "Status":"Solved"
+    },
+    {
+        "Puzzle size":"5x5_2",
+        "Solver":"Brute Force",
+        "Time (ms)":300000.0,
+        "Space (Steps)":0,
+        "Status":"Timeout"
     },
     {
         "Puzzle size":"6x6_1",
         "Solver":"Backward Chaining",
-        "Time (ms)":818.4442,
-        "Space (Steps)":600,
+        "Time (ms)":779.3854000047,
+        "Space (Steps)":596,
         "Status":"Solved"
     },
     {
         "Puzzle size":"6x6_1",
         "Solver":"Forward Chaining",
-        "Time (ms)":107.1553,
-        "Space (Steps)":82,
+        "Time (ms)":101.4942000038,
+        "Space (Steps)":78,
         "Status":"Solved"
     },
     {
         "Puzzle size":"6x6_1",
         "Solver":"SAT",
-        "Time (ms)":2.3729,
-        "Space (Steps)":36,
+        "Time (ms)":3.0078000273,
+        "Space (Steps)":32,
         "Status":"Solved"
     },
     {
         "Puzzle size":"6x6_1",
         "Solver":"A* H1",
-        "Time (ms)":8.7939,
-        "Space (Steps)":142,
+        "Time (ms)":7.8771000262,
+        "Space (Steps)":138,
         "Status":"Solved"
     },
     {
         "Puzzle size":"6x6_1",
         "Solver":"A* H2",
-        "Time (ms)":10.1285,
-        "Space (Steps)":142,
+        "Time (ms)":8.2798000076,
+        "Space (Steps)":138,
         "Status":"Solved"
     },
     {
         "Puzzle size":"6x6_1",
         "Solver":"Backtracking",
-        "Time (ms)":87924.0368000001,
-        "Space (Steps)":671108,
+        "Time (ms)":61148.0895000277,
+        "Space (Steps)":671104,
         "Status":"Solved"
+    },
+    {
+        "Puzzle size":"6x6_1",
+        "Solver":"Brute Force",
+        "Time (ms)":300000.0,
+        "Space (Steps)":0,
+        "Status":"Timeout"
     },
     {
         "Puzzle size":"6x6_2",
         "Solver":"Backward Chaining",
-        "Time (ms)":32799.5163,
-        "Space (Steps)":7782,
+        "Time (ms)":15441.0325000063,
+        "Space (Steps)":7781,
         "Status":"Solved"
     },
     {
         "Puzzle size":"6x6_2",
         "Solver":"Forward Chaining",
-        "Time (ms)":181.5472000001,
-        "Space (Steps)":162,
+        "Time (ms)":145.1870000456,
+        "Space (Steps)":161,
         "Status":"Solved"
     },
     {
         "Puzzle size":"6x6_2",
         "Solver":"SAT",
-        "Time (ms)":5.9082,
-        "Space (Steps)":36,
+        "Time (ms)":3.6072999937,
+        "Space (Steps)":35,
         "Status":"Solved"
     },
     {
         "Puzzle size":"6x6_2",
         "Solver":"A* H1",
-        "Time (ms)":7151.5535999999,
-        "Space (Steps)":23201,
+        "Time (ms)":2962.8545999876,
+        "Space (Steps)":23200,
         "Status":"Solved"
     },
     {
         "Puzzle size":"6x6_2",
         "Solver":"A* H2",
-        "Time (ms)":7915.6700999999,
-        "Space (Steps)":23068,
+        "Time (ms)":2701.3889999944,
+        "Space (Steps)":23067,
         "Status":"Solved"
     },
     {
         "Puzzle size":"6x6_2",
         "Solver":"Backtracking",
-        "Time (ms)":124415.1357999999,
-        "Space (Steps)":657116,
+        "Time (ms)":57960.210499994,
+        "Space (Steps)":657115,
         "Status":"Solved"
+    },
+    {
+        "Puzzle size":"6x6_2",
+        "Solver":"Brute Force",
+        "Time (ms)":300000.0,
+        "Space (Steps)":0,
+        "Status":"Timeout"
     },
     {
         "Puzzle size":"7x7_1",
         "Solver":"Backward Chaining",
-        "Time (ms)":3664.1225000001,
-        "Space (Steps)":729,
+        "Time (ms)":1162.4992000288,
+        "Space (Steps)":721,
         "Status":"Solved"
     },
     {
         "Puzzle size":"7x7_1",
         "Solver":"Forward Chaining",
-        "Time (ms)":3991.1463000001,
-        "Space (Steps)":807,
+        "Time (ms)":1270.8008000045,
+        "Space (Steps)":799,
         "Status":"Solved"
     },
     {
         "Puzzle size":"7x7_1",
         "Solver":"SAT",
-        "Time (ms)":16.6320000001,
-        "Space (Steps)":49,
+        "Time (ms)":5.9068999835,
+        "Space (Steps)":41,
         "Status":"Solved"
     },
     {
         "Puzzle size":"7x7_1",
         "Solver":"A* H1",
-        "Time (ms)":703.2836999999,
-        "Space (Steps)":2231,
+        "Time (ms)":250.8074999787,
+        "Space (Steps)":2223,
         "Status":"Solved"
     },
     {
         "Puzzle size":"7x7_1",
         "Solver":"A* H2",
-        "Time (ms)":759.3187,
-        "Space (Steps)":2231,
+        "Time (ms)":237.3841999797,
+        "Space (Steps)":2223,
         "Status":"Solved"
     },
     {
         "Puzzle size":"7x7_1",
         "Solver":"Backtracking",
-        "Time (ms)":10109.1211,
-        "Space (Steps)":40987,
+        "Time (ms)":3930.7748999563,
+        "Space (Steps)":40979,
         "Status":"Solved"
+    },
+    {
+        "Puzzle size":"7x7_1",
+        "Solver":"Brute Force",
+        "Time (ms)":300000.0,
+        "Space (Steps)":0,
+        "Status":"Timeout"
     },
     {
         "Puzzle size":"7x7_2",
@@ -303,34 +352,41 @@
     {
         "Puzzle size":"7x7_2",
         "Solver":"Forward Chaining",
-        "Time (ms)":564.8748999999,
-        "Space (Steps)":55,
+        "Time (ms)":238.1674000062,
+        "Space (Steps)":51,
         "Status":"Solved"
     },
     {
         "Puzzle size":"7x7_2",
         "Solver":"SAT",
-        "Time (ms)":13.0279,
-        "Space (Steps)":49,
+        "Time (ms)":8.387800015,
+        "Space (Steps)":45,
         "Status":"Solved"
     },
     {
         "Puzzle size":"7x7_2",
         "Solver":"A* H1",
-        "Time (ms)":7782.7927999999,
-        "Space (Steps)":18256,
+        "Time (ms)":4621.1934000021,
+        "Space (Steps)":18252,
         "Status":"Solved"
     },
     {
         "Puzzle size":"7x7_2",
         "Solver":"A* H2",
-        "Time (ms)":8653.1894000002,
-        "Space (Steps)":18251,
+        "Time (ms)":3350.8947999799,
+        "Space (Steps)":18247,
         "Status":"Solved"
     },
     {
         "Puzzle size":"7x7_2",
         "Solver":"Backtracking",
+        "Time (ms)":300000.0,
+        "Space (Steps)":0,
+        "Status":"Timeout"
+    },
+    {
+        "Puzzle size":"7x7_2",
+        "Solver":"Brute Force",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
         "Status":"Timeout"
@@ -338,44 +394,51 @@
     {
         "Puzzle size":"8x8",
         "Solver":"Backward Chaining",
-        "Time (ms)":1116.6743999997,
-        "Space (Steps)":83,
+        "Time (ms)":250.4008000251,
+        "Space (Steps)":50,
         "Status":"Solved"
     },
     {
         "Puzzle size":"8x8",
         "Solver":"Forward Chaining",
-        "Time (ms)":471.0998,
-        "Space (Steps)":81,
+        "Time (ms)":134.9581999821,
+        "Space (Steps)":48,
         "Status":"Solved"
     },
     {
         "Puzzle size":"8x8",
         "Solver":"SAT",
-        "Time (ms)":43.4363999998,
-        "Space (Steps)":81,
+        "Time (ms)":10.4407000472,
+        "Space (Steps)":48,
         "Status":"Solved"
     },
     {
         "Puzzle size":"8x8",
         "Solver":"A* H1",
-        "Time (ms)":42.7488999999,
-        "Space (Steps)":109,
+        "Time (ms)":7.2963000275,
+        "Space (Steps)":76,
         "Status":"Solved"
     },
     {
         "Puzzle size":"8x8",
         "Solver":"A* H2",
-        "Time (ms)":43.7485999996,
-        "Space (Steps)":109,
+        "Time (ms)":8.6559000192,
+        "Space (Steps)":76,
         "Status":"Solved"
     },
     {
         "Puzzle size":"8x8",
         "Solver":"Backtracking",
-        "Time (ms)":332.8434,
-        "Space (Steps)":1537,
+        "Time (ms)":111.9512000005,
+        "Space (Steps)":1504,
         "Status":"Solved"
+    },
+    {
+        "Puzzle size":"8x8",
+        "Solver":"Brute Force",
+        "Time (ms)":300000.0,
+        "Space (Steps)":0,
+        "Status":"Timeout"
     },
     {
         "Puzzle size":"9x9",
@@ -387,15 +450,15 @@
     {
         "Puzzle size":"9x9",
         "Solver":"Forward Chaining",
-        "Time (ms)":21065.3414000003,
-        "Space (Steps)":1479,
+        "Time (ms)":5258.3562999498,
+        "Space (Steps)":1474,
         "Status":"Solved"
     },
     {
         "Puzzle size":"9x9",
         "Solver":"SAT",
-        "Time (ms)":71.0955,
-        "Space (Steps)":81,
+        "Time (ms)":15.4129000148,
+        "Space (Steps)":76,
         "Status":"Solved"
     },
     {
@@ -415,6 +478,13 @@
     {
         "Puzzle size":"9x9",
         "Solver":"Backtracking",
+        "Time (ms)":300000.0,
+        "Space (Steps)":0,
+        "Status":"Timeout"
+    },
+    {
+        "Puzzle size":"9x9",
+        "Solver":"Brute Force",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
         "Status":"Timeout"

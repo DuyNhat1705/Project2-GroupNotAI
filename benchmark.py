@@ -163,7 +163,7 @@ if __name__ == '__main__':
         'A* H1':              {'class': AStar, 'option': 1},
         'A* H2':              {'class': AStar, 'option': 2},
         'Backtracking':       {'class': Backtracking},
-        # 'Brute Force':        {'class': BruteForce},
+        'Brute Force':        {'class': BruteForce},
     }
 
     # Puzzle sizes to test
