@@ -43,6 +43,14 @@ class BackwardChaining(BaseAlgorithm):
 
             self.kb.obs_facts = clean_facts
 
+            clean_rules = []
+            for rule in self.kb.horn_rules:
+                if isinstance(rule, Imply) and hasattr(rule.right, 'name') and rule.right.name == 'Val':
+                    continue  # Throw it in the trash
+                clean_rules.append(rule)
+
+            self.kb.horn_rules = clean_rules
+
             # Rebuild the KB leaning on solved grid
             for r in range(problem.size):
                 for c in range(problem.size):

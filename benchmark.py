@@ -4,6 +4,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import multiprocessing
+import tracemalloc
 from problem.futoshiki import Futoshiki
 
 from algorithms.forwardChaining import ForwardChaining
@@ -19,24 +20,38 @@ TIMEOUT = 300  # 5 minutes
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(CURRENT_DIR, 'Outputs')
 
-def run_solver_worker(solver_class, problem, queue, astar_option=None):
-    """
-    Runs the solver and puts the logger results into the queue.
-    """
-    solver = solver_class()
-    step_logger.reset(problem)
-    # Run the solver — pass heuristic option for AStar
-    if astar_option is not None:
-        grid = solver.solve(problem, option=astar_option)
-    else:
-        grid = solver.solve(problem)
 
-    total_steps = len(step_logger.steps) if hasattr(step_logger, 'steps') else 0
-    exec_time = step_logger.execution_time if hasattr(step_logger, 'execution_time') else 0
+def run_solver_worker(solver_class, problem, queue, astar_option=None):
+    # PASS 1: Pure Time Measurement
+    solver_time = solver_class()
+    step_logger.reset(problem)
+
+    if astar_option is not None:
+        grid = solver_time.solve(problem, option=astar_option)
+    else:
+        grid = solver_time.solve(problem)
+
+    true_time_ms = step_logger.execution_time
+    total_steps = len(step_logger.steps)
+
+    # PASS 2: Memory Measurement
+    solver_mem = solver_class()
+
+    tracemalloc.start()
+    if astar_option is not None:
+        solver_mem.solve(problem, option=astar_option)
+    else:
+        solver_mem.solve(problem)
+
+    _, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+
+    peak_memory_kb = peak / 1024.0
 
     queue.put({
-        'time_ms': exec_time,
+        'time_ms': true_time_ms,
         'space_steps': total_steps,
+        'memory_kb': peak_memory_kb,
         'solved': grid is not None
     })
 
@@ -73,17 +88,20 @@ def benchmark_puzzle(solvers, puzzle_file, puzzle_name):
                 'Solver': solver_name,
                 'Time (ms)': TIMEOUT * 1000,
                 'Space (Steps)': 0,
+                'Memory (KB)': 0.0,  # <--- Default for timeout
                 'Status': 'Timeout'
             })
         else:
             if not queue.empty():
                 data = queue.get()
-                print(f"  [+] Finished in {data['time_ms']:.2f} ms with {data['space_steps']} steps.")
+                print(
+                    f"  [+] Finished in {data['time_ms']:.2f} ms | {data['space_steps']} steps | {data['memory_kb']:.2f} KB.")
                 results.append({
                     'Puzzle size': puzzle_name,
                     'Solver': solver_name,
                     'Time (ms)': data['time_ms'],
                     'Space (Steps)': data['space_steps'],
+                    'Memory (KB)': data['memory_kb'],
                     'Status': 'Solved' if data['solved'] else 'Failed'
                 })
             else:
@@ -92,6 +110,7 @@ def benchmark_puzzle(solvers, puzzle_file, puzzle_name):
                     'Solver': solver_name,
                     'Time (ms)': TIMEOUT * 1000,
                     'Space (Steps)': 0,
+                    'Memory (KB)': 0.0,
                     'Status': 'Crash/Error'
                 })
 
@@ -138,7 +157,7 @@ def _gen_charts(df):
     plt.close(fig1)
     print(f" -> Saved at {time_benchmark_path}")
 
-    # --- Bảng 2: Complexity (Total Steps) ---
+    # --- Bảng 2: Total Steps ---
     fig2, ax2 = plt.subplots(figsize=(12, 6))
     df_solved = df[df['Status'] == 'Solved']
     sns.barplot(data=df_solved, x='Puzzle size', y='Space (Steps)', hue='Solver', ax=ax2, palette=palette)
@@ -147,23 +166,39 @@ def _gen_charts(df):
     ax2.set_yscale('log')
     ax2.legend(title='Solver', bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0)
     plt.tight_layout()
-    space_benchmark_path = os.path.join(OUTPUT_DIR, "Benchmark_Space.pdf")
+    space_benchmark_path = os.path.join(OUTPUT_DIR, "Benchmark_StepSpace.pdf")
     fig2.savefig(space_benchmark_path, dpi=300)
     plt.close(fig2)
     print(f" -> Saved at {space_benchmark_path}")
 
+    # --- Bảng 3: Peak Memory Usage ---
+    fig3, ax3 = plt.subplots(figsize=(12, 6))
+
+    df_solved = df[df['Status'] == 'Solved']
+    sns.barplot(data=df_solved, x='Puzzle size', y='Memory (KB)', hue='Solver', ax=ax3, palette=palette)
+
+    ax3.set_title('Memory Usage (KB)', fontsize=14)
+    ax3.set_ylabel('Memory (KB)')
+    ax3.set_yscale('log')  # Log scale helps visualize large differences
+    ax3.legend(title='Solver', bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0)
+    plt.tight_layout()
+
+    memory_benchmark_path = os.path.join(OUTPUT_DIR, "Benchmark_Memory.pdf")
+    fig3.savefig(memory_benchmark_path, dpi=300)
+    plt.close(fig3)
+    print(f" -> Saved at {memory_benchmark_path}")
 
 if __name__ == '__main__':
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     solvers = {
-        'Backward Chaining':  {'class': BackwardChaining},
-        'Forward Chaining':   {'class': ForwardChaining},
+        # 'Backward Chaining':  {'class': BackwardChaining},
+        # 'Forward Chaining':   {'class': ForwardChaining},
         'SAT':                {'class': SATSolver},
         'A* H1':              {'class': AStar, 'option': 1},
         'A* H2':              {'class': AStar, 'option': 2},
-        'Backtracking':       {'class': Backtracking},
-        'Brute Force':        {'class': BruteForce},
+        # 'Backtracking':       {'class': Backtracking},
+        # 'Brute Force':        {'class': BruteForce},
     }
 
     # Puzzle sizes to test
@@ -172,12 +207,12 @@ if __name__ == '__main__':
         '4x4_2': 'input-02',  # Dễ
         '5x5_1': 'input-03',  # Trung bình
         '5x5_2': 'input-04',  # Trung bình - Khó
-        '6x6_1': 'input-05',  # Khó
-        '6x6_2': 'input-06',  # Khó - Ít gợi ý
-        '7x7_1': 'input-07',  # Rất khó
-        '7x7_2': 'input-08',  # Chuyên gia
-        '8x8': 'input-09',    # Cực khó
-        '9x9': 'input-10',    # Bậc thầy
+        # '6x6_1': 'input-05',  # Khó
+        # '6x6_2': 'input-06',  # Khó - Ít gợi ý
+        # '7x7_1': 'input-07',  # Rất khó
+        # '7x7_2': 'input-08',  # Chuyên gia
+        # '8x8': 'input-09',    # Cực khó
+        # '9x9': 'input-10',    # Bậc thầy
     }
 
     all_results = []
