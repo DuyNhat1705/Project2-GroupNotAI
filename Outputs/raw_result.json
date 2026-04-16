@@ -4,6 +4,7 @@
         "Solver":"Backward Chaining",
         "Time (ms)":37.5859999913,
         "Space (Steps)":36,
+        "Memory (KB)":717.021484375,
         "Status":"Solved"
     },
     {
@@ -11,6 +12,7 @@
         "Solver":"Forward Chaining",
         "Time (ms)":5.0996000064,
         "Space (Steps)":14,
+        "Memory (KB)":448.45703125,
         "Status":"Solved"
     },
     {
@@ -18,6 +20,7 @@
         "Solver":"SAT",
         "Time (ms)":1.2055999832,
         "Space (Steps)":14,
+        "Memory (KB)":25.0390625,
         "Status":"Solved"
     },
     {
@@ -25,6 +28,7 @@
         "Solver":"A* H1",
         "Time (ms)":0.3361999989,
         "Space (Steps)":14,
+        "Memory (KB)":93.05859375,
         "Status":"Solved"
     },
     {
@@ -32,6 +36,7 @@
         "Solver":"A* H2",
         "Time (ms)":0.3800999839,
         "Space (Steps)":14,
+        "Memory (KB)":93.05859375,
         "Status":"Solved"
     },
     {
@@ -39,6 +44,7 @@
         "Solver":"Backtracking",
         "Time (ms)":3.6185999634,
         "Space (Steps)":236,
+        "Memory (KB)":1245.96875,
         "Status":"Solved"
     },
     {
@@ -46,6 +52,7 @@
         "Solver":"Brute Force",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
+        "Memory (KB)":0.0,
         "Status":"Timeout"
     },
     {
@@ -53,6 +60,7 @@
         "Solver":"Backward Chaining",
         "Time (ms)":90.7816999825,
         "Space (Steps)":92,
+        "Memory (KB)":1079.6669921875,
         "Status":"Solved"
     },
     {
@@ -60,6 +68,7 @@
         "Solver":"Forward Chaining",
         "Time (ms)":6.6149000195,
         "Space (Steps)":16,
+        "Memory (KB)":524.6328125,
         "Status":"Solved"
     },
     {
@@ -67,6 +76,7 @@
         "Solver":"SAT",
         "Time (ms)":1.1618999997,
         "Space (Steps)":16,
+        "Memory (KB)":27.384765625,
         "Status":"Solved"
     },
     {
@@ -74,6 +84,7 @@
         "Solver":"A* H1",
         "Time (ms)":0.5690999678,
         "Space (Steps)":34,
+        "Memory (KB)":208.20703125,
         "Status":"Solved"
     },
     {
@@ -81,6 +92,7 @@
         "Solver":"A* H2",
         "Time (ms)":0.6853000377,
         "Space (Steps)":34,
+        "Memory (KB)":208.20703125,
         "Status":"Solved"
     },
     {
@@ -88,6 +100,7 @@
         "Solver":"Backtracking",
         "Time (ms)":8.2381999819,
         "Space (Steps)":696,
+        "Memory (KB)":3686.6015625,
         "Status":"Solved"
     },
     {
@@ -95,6 +108,7 @@
         "Solver":"Brute Force",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
+        "Memory (KB)":0.0,
         "Status":"Timeout"
     },
     {
@@ -102,6 +116,7 @@
         "Solver":"Backward Chaining",
         "Time (ms)":81.6041999497,
         "Space (Steps)":63,
+        "Memory (KB)":1536.087890625,
         "Status":"Solved"
     },
     {
@@ -109,6 +124,7 @@
         "Solver":"Forward Chaining",
         "Time (ms)":11.1107000266,
         "Space (Steps)":21,
+        "Memory (KB)":971.400390625,
         "Status":"Solved"
     },
     {
@@ -116,6 +132,7 @@
         "Solver":"SAT",
         "Time (ms)":0.8921999834,
         "Space (Steps)":21,
+        "Memory (KB)":59.81640625,
         "Status":"Solved"
     },
     {
@@ -123,6 +140,7 @@
         "Solver":"A* H1",
         "Time (ms)":0.6146000233,
         "Space (Steps)":27,
+        "Memory (KB)":388.763671875,
         "Status":"Solved"
     },
     {
@@ -130,6 +148,7 @@
         "Solver":"A* H2",
         "Time (ms)":0.7180999964,
         "Space (Steps)":27,
+        "Memory (KB)":388.763671875,
         "Status":"Solved"
     },
     {
@@ -137,6 +156,7 @@
         "Solver":"Backtracking",
         "Time (ms)":6.0598999844,
         "Space (Steps)":261,
+        "Memory (KB)":3223.728515625,
         "Status":"Solved"
     },
     {
@@ -144,6 +164,7 @@
         "Solver":"Brute Force",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
+        "Memory (KB)":0.0,
         "Status":"Timeout"
     },
     {
@@ -151,6 +172,7 @@
         "Solver":"Backward Chaining",
         "Time (ms)":243.0633999757,
         "Space (Steps)":168,
+        "Memory (KB)":2581.9794921875,
         "Status":"Solved"
     },
     {
@@ -158,6 +180,7 @@
         "Solver":"Forward Chaining",
         "Time (ms)":24.2741999682,
         "Space (Steps)":42,
+        "Memory (KB)":1169.16015625,
         "Status":"Solved"
     },
     {
@@ -165,6 +188,7 @@
         "Solver":"SAT",
         "Time (ms)":2.0515000215,
         "Space (Steps)":24,
+        "Memory (KB)":66.408203125,
         "Status":"Solved"
     },
     {
@@ -172,6 +196,7 @@
         "Solver":"A* H1",
         "Time (ms)":10.762400052,
         "Space (Steps)":256,
+        "Memory (KB)":3892.4765625,
         "Status":"Solved"
     },
     {
@@ -179,6 +204,7 @@
         "Solver":"A* H2",
         "Time (ms)":13.1908999756,
         "Space (Steps)":256,
+        "Memory (KB)":3892.4765625,
         "Status":"Solved"
     },
     {
@@ -186,6 +212,7 @@
         "Solver":"Backtracking",
         "Time (ms)":668.3947999845,
         "Space (Steps)":16870,
+        "Memory (KB)":229331.33984375,
         "Status":"Solved"
     },
     {
@@ -193,6 +220,7 @@
         "Solver":"Brute Force",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
+        "Memory (KB)":0.0,
         "Status":"Timeout"
     },
     {
@@ -200,6 +228,7 @@
         "Solver":"Backward Chaining",
         "Time (ms)":779.3854000047,
         "Space (Steps)":596,
+        "Memory (KB)":8840.2294921875,
         "Status":"Solved"
     },
     {
@@ -207,6 +236,7 @@
         "Solver":"Forward Chaining",
         "Time (ms)":101.4942000038,
         "Space (Steps)":78,
+        "Memory (KB)":2250.92578125,
         "Status":"Solved"
     },
     {
@@ -214,6 +244,7 @@
         "Solver":"SAT",
         "Time (ms)":3.0078000273,
         "Space (Steps)":32,
+        "Memory (KB)":90.78515625,
         "Status":"Solved"
     },
     {
@@ -221,6 +252,7 @@
         "Solver":"A* H1",
         "Time (ms)":7.8771000262,
         "Space (Steps)":138,
+        "Memory (KB)":2669.939453125,
         "Status":"Solved"
     },
     {
@@ -228,6 +260,7 @@
         "Solver":"A* H2",
         "Time (ms)":8.2798000076,
         "Space (Steps)":138,
+        "Memory (KB)":2669.939453125,
         "Status":"Solved"
     },
     {
@@ -235,6 +268,7 @@
         "Solver":"Backtracking",
         "Time (ms)":61148.0895000277,
         "Space (Steps)":671104,
+        "Memory (KB)":12484834.7734375,
         "Status":"Solved"
     },
     {
@@ -242,6 +276,7 @@
         "Solver":"Brute Force",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
+        "Memory (KB)":0.0,
         "Status":"Timeout"
     },
     {
@@ -249,6 +284,7 @@
         "Solver":"Backward Chaining",
         "Time (ms)":15441.0325000063,
         "Space (Steps)":7781,
+        "Memory (KB)":93937.0732421875,
         "Status":"Solved"
     },
     {
@@ -256,6 +292,7 @@
         "Solver":"Forward Chaining",
         "Time (ms)":145.1870000456,
         "Space (Steps)":161,
+        "Memory (KB)":3030.541015625,
         "Status":"Solved"
     },
     {
@@ -263,6 +300,7 @@
         "Solver":"SAT",
         "Time (ms)":3.6072999937,
         "Space (Steps)":35,
+        "Memory (KB)":97.439453125,
         "Status":"Solved"
     },
     {
@@ -270,6 +308,7 @@
         "Solver":"A* H1",
         "Time (ms)":2962.8545999876,
         "Space (Steps)":23200,
+        "Memory (KB)":479115.365234375,
         "Status":"Solved"
     },
     {
@@ -277,6 +316,7 @@
         "Solver":"A* H2",
         "Time (ms)":2701.3889999944,
         "Space (Steps)":23067,
+        "Memory (KB)":477883.208984375,
         "Status":"Solved"
     },
     {
@@ -284,6 +324,7 @@
         "Solver":"Backtracking",
         "Time (ms)":57960.210499994,
         "Space (Steps)":657115,
+        "Memory (KB)":12726425.091796875,
         "Status":"Solved"
     },
     {
@@ -291,6 +332,7 @@
         "Solver":"Brute Force",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
+        "Memory (KB)":0.0,
         "Status":"Timeout"
     },
     {
@@ -298,6 +340,7 @@
         "Solver":"Backward Chaining",
         "Time (ms)":1162.4992000288,
         "Space (Steps)":721,
+        "Memory (KB)":15342.0185546875,
         "Status":"Solved"
     },
     {
@@ -305,6 +348,7 @@
         "Solver":"Forward Chaining",
         "Time (ms)":1270.8008000045,
         "Space (Steps)":799,
+        "Memory (KB)":8619.896484375,
         "Status":"Solved"
     },
     {
@@ -312,6 +356,7 @@
         "Solver":"SAT",
         "Time (ms)":5.9068999835,
         "Space (Steps)":41,
+        "Memory (KB)":165.263671875,
         "Status":"Solved"
     },
     {
@@ -319,6 +364,7 @@
         "Solver":"A* H1",
         "Time (ms)":250.8074999787,
         "Space (Steps)":2223,
+        "Memory (KB)":55746.060546875,
         "Status":"Solved"
     },
     {
@@ -326,6 +372,7 @@
         "Solver":"A* H2",
         "Time (ms)":237.3841999797,
         "Space (Steps)":2223,
+        "Memory (KB)":55746.060546875,
         "Status":"Solved"
     },
     {
@@ -333,6 +380,7 @@
         "Solver":"Backtracking",
         "Time (ms)":3930.7748999563,
         "Space (Steps)":40979,
+        "Memory (KB)":966592.232421875,
         "Status":"Solved"
     },
     {
@@ -340,6 +388,7 @@
         "Solver":"Brute Force",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
+        "Memory (KB)":0.0,
         "Status":"Timeout"
     },
     {
@@ -347,6 +396,7 @@
         "Solver":"Backward Chaining",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
+        "Memory (KB)":0.0,
         "Status":"Timeout"
     },
     {
@@ -354,6 +404,7 @@
         "Solver":"Forward Chaining",
         "Time (ms)":238.1674000062,
         "Space (Steps)":51,
+        "Memory (KB)":4263.771484375,
         "Status":"Solved"
     },
     {
@@ -361,6 +412,7 @@
         "Solver":"SAT",
         "Time (ms)":8.387800015,
         "Space (Steps)":45,
+        "Memory (KB)":177.833984375,
         "Status":"Solved"
     },
     {
@@ -368,6 +420,7 @@
         "Solver":"A* H1",
         "Time (ms)":4621.1934000021,
         "Space (Steps)":18252,
+        "Memory (KB)":493124.685546875,
         "Status":"Solved"
     },
     {
@@ -375,6 +428,7 @@
         "Solver":"A* H2",
         "Time (ms)":3350.8947999799,
         "Space (Steps)":18247,
+        "Memory (KB)":493052.53515625,
         "Status":"Solved"
     },
     {
@@ -382,6 +436,7 @@
         "Solver":"Backtracking",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
+        "Memory (KB)":0.0,
         "Status":"Timeout"
     },
     {
@@ -389,6 +444,7 @@
         "Solver":"Brute Force",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
+        "Memory (KB)":0.0,
         "Status":"Timeout"
     },
     {
@@ -396,6 +452,7 @@
         "Solver":"Backward Chaining",
         "Time (ms)":250.4008000251,
         "Space (Steps)":50,
+        "Memory (KB)":8965.650390625,
         "Status":"Solved"
     },
     {
@@ -403,6 +460,7 @@
         "Solver":"Forward Chaining",
         "Time (ms)":134.9581999821,
         "Space (Steps)":48,
+        "Memory (KB)":7723.8671875,
         "Status":"Solved"
     },
     {
@@ -410,6 +468,7 @@
         "Solver":"SAT",
         "Time (ms)":10.4407000472,
         "Space (Steps)":48,
+        "Memory (KB)":215.216796875,
         "Status":"Solved"
     },
     {
@@ -417,6 +476,7 @@
         "Solver":"A* H1",
         "Time (ms)":7.2963000275,
         "Space (Steps)":76,
+        "Memory (KB)":2960.396484375,
         "Status":"Solved"
     },
     {
@@ -424,6 +484,7 @@
         "Solver":"A* H2",
         "Time (ms)":8.6559000192,
         "Space (Steps)":76,
+        "Memory (KB)":2960.396484375,
         "Status":"Solved"
     },
     {
@@ -431,6 +492,7 @@
         "Solver":"Backtracking",
         "Time (ms)":111.9512000005,
         "Space (Steps)":1504,
+        "Memory (KB)":53250.4375,
         "Status":"Solved"
     },
     {
@@ -438,6 +500,7 @@
         "Solver":"Brute Force",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
+        "Memory (KB)":0.0,
         "Status":"Timeout"
     },
     {
@@ -445,6 +508,7 @@
         "Solver":"Backward Chaining",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
+        "Memory (KB)":0.0,
         "Status":"Timeout"
     },
     {
@@ -452,6 +516,7 @@
         "Solver":"Forward Chaining",
         "Time (ms)":5258.3562999498,
         "Space (Steps)":1474,
+        "Memory (KB)":26454.02734375,
         "Status":"Solved"
     },
     {
@@ -459,6 +524,7 @@
         "Solver":"SAT",
         "Time (ms)":15.4129000148,
         "Space (Steps)":76,
+        "Memory (KB)":305.427734375,
         "Status":"Solved"
     },
     {
@@ -466,6 +532,7 @@
         "Solver":"A* H1",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
+        "Memory (KB)":0.0,
         "Status":"Timeout"
     },
     {
@@ -473,6 +540,7 @@
         "Solver":"A* H2",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
+        "Memory (KB)":0.0,
         "Status":"Timeout"
     },
     {
@@ -480,6 +548,7 @@
         "Solver":"Backtracking",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
+        "Memory (KB)":0.0,
         "Status":"Timeout"
     },
     {
@@ -487,6 +556,7 @@
         "Solver":"Brute Force",
         "Time (ms)":300000.0,
         "Space (Steps)":0,
+        "Memory (KB)":0.0,
         "Status":"Timeout"
     }
 ]

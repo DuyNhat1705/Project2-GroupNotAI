@@ -54,7 +54,8 @@ class BruteForce(BaseAlgorithm):
                 solution[i][j] = num
                 step_logger.log_step(i, j, num, tag = "try", domains = step_logger.grid_to_domains(solution))
                 if (i == n - 1) and (j == n - 1):
-                    return self.isValid(solution, problem, n)
+                    if self.isValid(solution, problem, n):
+                        return True
                 if self.recursion(solution, problem, indexRow, indexCol, n):
                     return True
                 solution[i][j] = 0
