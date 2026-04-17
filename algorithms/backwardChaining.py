@@ -37,7 +37,7 @@ class BackwardChaining(BaseAlgorithm):
             # Filter out all 'Val' and 'Given' facts
             clean_facts = []
             for fact in self.kb.obs_facts:
-                if hasattr(fact, 'name') and fact.name in ['Val', 'Given']:
+                if hasattr(fact, 'name') and fact.name == 'Val':
                     continue  # Throw it in the trash
                 clean_facts.append(fact)
 
@@ -410,25 +410,48 @@ class BackwardChaining(BaseAlgorithm):
 
                 # --- Pre-Solve Short-Circuit ---
                 # Query check: Val(int, int, Variable)
-                is_domain_query = (
-                        name == 'Val' and
-                        len(parsed_args) == 3 and
+                is_forward_query = (
+                        name == 'Val' and len(parsed_args) == 3 and
                         isinstance(parsed_args[0], int) and
                         isinstance(parsed_args[1], int) and
                         isinstance(parsed_args[2], Var)
                 )
 
-                if is_domain_query and not getattr(self, 'is_solved', False):
-                    # PRE-SOLVED: Just look in domain scratchpad
-                    r, c = parsed_args[0], parsed_args[1]
-                    var_name = parsed_args[2].name
+                is_reverse_query = (
+                        name == 'Val' and len(parsed_args) == 3 and
+                        isinstance(parsed_args[0], int) and
+                        isinstance(parsed_args[1], Var) and
+                        isinstance(parsed_args[2], int)
+                )
 
-                    domain = getattr(self, 'domains', {}).get((r - 1, c - 1))
+                if (is_forward_query or is_reverse_query) and not getattr(self, 'is_solved', False):
 
-                    if domain:
-                        print(f"{var_name} = {{{', '.join(map(str, sorted(domain)))}}} ;")
-                    else:
-                        print("false. (Domain is empty or out of bounds)")
+                    if is_forward_query:
+                        r, c = parsed_args[0], parsed_args[1]
+                        var_name = parsed_args[2].name
+                        domain = getattr(self, 'domains', {}).get((r - 1, c - 1))
+
+                        if domain:
+                            print(f"{var_name} = {{{', '.join(map(str, sorted(domain)))}}} ;")
+                        else:
+                            print("false.")
+
+                    elif is_reverse_query:
+                        r, target_val = parsed_args[0], parsed_args[2]
+                        var_name = parsed_args[1].name
+                        found_cols = []
+
+                        # Scan the domains in that row to see which columns still allow the target value
+                        for c in range(problem.size):
+                            domain = getattr(self, 'domains', {}).get((r - 1, c))
+                            if domain and target_val in domain:
+                                found_cols.append(c + 1)  # 1-indexed
+
+                        if found_cols:
+                            for col in found_cols:
+                                print(f"{var_name} = {col} ;")
+                        else:
+                            print("false.")
 
                     print("false.")
                     continue  # Skip the rest of the loop
