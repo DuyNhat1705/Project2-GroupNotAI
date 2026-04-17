@@ -68,7 +68,7 @@ def render_analytics_page(filtered_df):
 
     st.markdown("---")
 
-    st.subheader("Solving Steps (Space Complexity)")
+    st.subheader("Solving Steps by Puzzle Size")
     fig_steps = px.bar(
         filtered_df, 
         x="Puzzle size", 
@@ -98,6 +98,41 @@ def render_analytics_page(filtered_df):
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )
     st.plotly_chart(fig_steps, use_container_width=True)
+    st.markdown("---")
 
+    st.subheader("Memory Usage by Puzzle Size")
+    
+    fig_memory = px.bar(
+        filtered_df, 
+        x="Puzzle size", 
+        y="Memory (KB)",
+        color="Solver",
+        barmode="group",
+        color_discrete_map=constants.COLOR_MAP,
+        labels={"Memory (KB)": "Memory (KB)", "Puzzle size": "Grid Size"}
+    )
+    
+    fig_memory.update_yaxes(
+        type="log",
+        range=[1, 7], 
+        tickvals=[10, 100, 1000, 10000, 100000, 1000000, 10000000],
+        ticktext=["10", "100", "1k", "10k", "100k", "1M", "10M"],
+        showgrid=True,
+        gridwidth=0.5,
+        gridcolor='rgba(255, 255, 255, 0.1)',
+        minor_showgrid=False,
+        zeroline=False
+    )
+    
+    fig_memory.update_layout(
+        template="plotly_dark",
+        hovermode="x unified",
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font=dict(family="JetBrains Mono, monospace", size=12),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+    )
+    
+    st.plotly_chart(fig_memory, use_container_width=True)
     with st.expander("See Raw Data Table"):
         st.dataframe(filtered_df, use_container_width=True)
