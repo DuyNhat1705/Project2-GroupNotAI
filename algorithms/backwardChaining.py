@@ -408,51 +408,77 @@ class BackwardChaining(BaseAlgorithm):
                     else:
                         parsed_args.append(arg)
 
-                # --- Pre-Solve Short-Circuit ---
-                # Query check: Val(int, int, Variable)
-                is_forward_query = (
+                
+                # --- Pre-Solve ---
+                
+                # Forward: Val(Row, Col, $V)
+                is_fquery = (
                         name == 'Val' and len(parsed_args) == 3 and
                         isinstance(parsed_args[0], int) and
                         isinstance(parsed_args[1], int) and
                         isinstance(parsed_args[2], Var)
                 )
 
-                is_reverse_query = (
+                # Column: Val(Row, $C, Val)
+                is_cquery = (
                         name == 'Val' and len(parsed_args) == 3 and
                         isinstance(parsed_args[0], int) and
                         isinstance(parsed_args[1], Var) and
                         isinstance(parsed_args[2], int)
                 )
 
-                if (is_forward_query or is_reverse_query) and not getattr(self, 'is_solved', False):
+                # Row: Val($R, Col, Val)
+                is_rquery = (
+                        name == 'Val' and len(parsed_args) == 3 and
+                        isinstance(parsed_args[0], Var) and
+                        isinstance(parsed_args[1], int) and
+                        isinstance(parsed_args[2], int)
+                )
 
-                    if is_forward_query:
+                if (is_fquery or is_cquery or is_rquery) and not getattr(self, 'is_solved', False):
+                    
+                    if is_fquery:
                         r, c = parsed_args[0], parsed_args[1]
                         var_name = parsed_args[2].name
                         domain = getattr(self, 'domains', {}).get((r - 1, c - 1))
-
+                        
                         if domain:
                             print(f"{var_name} = {{{', '.join(map(str, sorted(domain)))}}} ;")
                         else:
                             print("false.")
-
-                    elif is_reverse_query:
+                            
+                    elif is_cquery:
                         r, target_val = parsed_args[0], parsed_args[2]
                         var_name = parsed_args[1].name
                         found_cols = []
-
-                        # Scan the domains in that row to see which columns still allow the target value
+                        
                         for c in range(problem.size):
                             domain = getattr(self, 'domains', {}).get((r - 1, c))
                             if domain and target_val in domain:
-                                found_cols.append(c + 1)  # 1-indexed
-
+                                found_cols.append(c + 1)
+                        
                         if found_cols:
                             for col in found_cols:
                                 print(f"{var_name} = {col} ;")
                         else:
                             print("false.")
 
+                    elif is_rquery:
+                        c, target_val = parsed_args[1], parsed_args[2]
+                        var_name = parsed_args[0].name
+                        found_rows = []
+                        
+                        for r in range(problem.size):
+                            domain = getattr(self, 'domains', {}).get((r, c - 1))
+                            if domain and target_val in domain:
+                                found_rows.append(r + 1)
+                        
+                        if found_rows:
+                            for row in found_rows:
+                                print(f"{var_name} = {row} ;")
+                        else:
+                            print("false.")
+                            
                     print("false.")
                     continue  # Skip the rest of the loop
 
