@@ -2,9 +2,9 @@ from problem.futoshiki import Futoshiki
 from algorithms.algorithm_factory import get_algorithm
 
 def main():
-    algorithm = get_algorithm('bf')
+    algorithm = get_algorithm('bc')
     problem = Futoshiki('input-01')
-    # problem.printFutoshiki()
+    problem.printFutoshiki()
 
     if algorithm.name == "Backward Chaining":
         algorithm._start_query_console(problem)
