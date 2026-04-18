@@ -76,5 +76,6 @@ class Backtracking(BaseAlgorithm):
         self.recursion(solution, problem, 0, 0, n)
         end_time = time.perf_counter()
         step_logger.execution_time = (end_time - start_time) * 1000
+        print(f"\nPuzzle Solved in {step_logger.execution_time:.2f}ms!\n")
         step_logger.memory_usage = sys.getsizeof(solution) + sys.getsizeof(self.row_mask) + sys.getsizeof(self.col_mask)
         return solution

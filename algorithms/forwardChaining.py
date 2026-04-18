@@ -23,7 +23,7 @@ class ForwardChaining(BaseAlgorithm):
 
         result_kb = self._backtrack(kb)
         step_logger.execution_time = (time.perf_counter() - start_time) * 1000
-
+        print(f"\nPuzzle Solved in {step_logger.execution_time:.2f}ms!\n")
         if result_kb is None:
             return None
         return self._get_result_grid(result_kb)
