@@ -192,13 +192,13 @@ if __name__ == '__main__':
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     solvers = {
-        # 'Backward Chaining':  {'class': BackwardChaining},
-        # 'Forward Chaining':   {'class': ForwardChaining},
+        'Backward Chaining':  {'class': BackwardChaining},
+        'Forward Chaining':   {'class': ForwardChaining},
         'SAT':                {'class': SATSolver},
         'A* H1':              {'class': AStar, 'option': 1},
         'A* H2':              {'class': AStar, 'option': 2},
-        # 'Backtracking':       {'class': Backtracking},
-        # 'Brute Force':        {'class': BruteForce},
+        'Backtracking':       {'class': Backtracking},
+        'Brute Force':        {'class': BruteForce},
     }
 
     # Puzzle sizes to test
@@ -207,12 +207,12 @@ if __name__ == '__main__':
         '4x4_2': 'input-02',  # Dễ
         '5x5_1': 'input-03',  # Trung bình
         '5x5_2': 'input-04',  # Trung bình - Khó
-        # '6x6_1': 'input-05',  # Khó
-        # '6x6_2': 'input-06',  # Khó - Ít gợi ý
-        # '7x7_1': 'input-07',  # Rất khó
-        # '7x7_2': 'input-08',  # Chuyên gia
-        # '8x8': 'input-09',    # Cực khó
-        # '9x9': 'input-10',    # Bậc thầy
+        '6x6_1': 'input-05',  # Khó
+        '6x6_2': 'input-06',  # Khó - Ít gợi ý
+        '7x7_1': 'input-07',  # Rất khó
+        '7x7_2': 'input-08',  # Chuyên gia
+        '9x9_1': 'input-09',    # Cực khó
+        '9x9_2': 'input-10',    # Bậc thầy
     }
 
     all_results = []
