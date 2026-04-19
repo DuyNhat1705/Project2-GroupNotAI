@@ -62,6 +62,11 @@ Project2-GroupNotAI/
    python benchmark.py
    ```
 
+4. **Run Solving Futoshiki in Console**
+   ```bash
+   python main.py
+   ```
+
 ## 4. Key Features
 * **Step-by-step Visualization:** Slider allows detailed observation of number filling process and algorithm backtracking in real-time.
 * **Performance Analytics:** Dashboard directly compares execution time, nodes explored, and backtrack count across algorithms.

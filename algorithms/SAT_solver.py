@@ -107,7 +107,6 @@ class SATSolver(BaseAlgorithm):
 
             step_logger.execution_time = (time.perf_counter() - start_time) * 1000
             print(f"\nPuzzle Solved by PySAT in {step_logger.execution_time:.2f}ms!")
-            problem.printFutoshiki()
             solver.delete()
             return problem.grid
         else:

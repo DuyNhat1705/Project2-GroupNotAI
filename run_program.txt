@@ -1,3 +1,0 @@
-Chạy file main (khi ở folder Project2-GroupNotAI): python main.py
-Chạy file benchmark (khi ở folder Project2-GroupNotAI): python benchmark.py
-Chạy file app (khi ở folder Project2-GroupNotAI): streamlit run app.py
